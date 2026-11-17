@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><%= h title %> · MMP Explorer</title>
+<title><%= h title %> · MMP Split Vote Explorer</title>
 <link rel="canonical" href="<%= page_path(year, slug) %>">
 <style>
   :root {
@@ -70,7 +70,7 @@
 <body>
 <%- lists = electorate_lists(year) -%>
 <header>
-  <a class="site" href="/">MMP Explorer</a>
+  <a class="site" href="/">MMP Split Vote Explorer</a>
   <nav class="years" aria-label="Election year">
   <%- year_links(self).each do |y, st, href| -%>
     <a href="<%= href %>"<%= ' aria-current="page"' if y == year %>><%= y %><%= ' (preliminary)' if st == 'preliminary' %></a>

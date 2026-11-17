@@ -1,4 +1,4 @@
-# MMP Explorer
+# MMP Split Vote Explorer
 
 How New Zealand voters split their party vote and electorate vote, shown as a
 static Sankey diagram for each electorate. No JavaScript: the chart is SVG
