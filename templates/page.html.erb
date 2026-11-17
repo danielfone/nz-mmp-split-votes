@@ -38,6 +38,7 @@
   .sankey .f.same { opacity: .16; }
   .sankey text { font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
   .sankey .name { font-weight: 600; }
+  .sankey .right .name { font-weight: 400; letter-spacing: .05em; }
   .sankey .fig { fill: var(--muted); }
   .sankey .node[tabindex] { cursor: pointer; outline: none; }
   .sankey .node:is(:hover, :focus) .bar { stroke: var(--ink); stroke-width: 2; }
@@ -96,7 +97,7 @@
 <%- if flows? -%>
 <p class="status"><%= status.capitalize %> results · split votes published</p>
 <%- votes, party, cand = biggest_split -%>
-<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party. The biggest group: <strong><%= num votes %> <%= h party.label %> party voters chose <%= h cand.label %></strong>.</p>
+<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party. The biggest group: <strong><%= num votes %> <%= h party.label %> party voters chose <%= h cand.official %></strong>.</p>
 <%- elsif candidates.any? -%>
 <p class="status"><%= status.capitalize %> count · split votes not yet published</p>
 <p class="lede">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>
@@ -143,7 +144,7 @@
       <th scope="col">Party vote</th>
       <th scope="col">Voters</th>
     <%- candidates.each do |c| -%>
-      <th scope="col"><%= h c.label %></th>
+      <th scope="col"><%= h c.official %></th>
     <%- end -%>
     </tr>
   </thead>
@@ -180,7 +181,7 @@
   <thead><tr><th scope="col">Candidate</th><%- unless national? -%><th scope="col">Party</th><%- end -%><th scope="col">Votes</th><th scope="col">Share</th></tr></thead>
   <tbody>
   <%- candidates.each do |c| -%>
-    <tr><th scope="row"><%= h(c.special? || national? ? c.label : display_name(c.name)) %></th><%- unless national? -%><td class="text"><%= c.special? ? '' : h(short(c.party)) %></td><%- end -%><td><%= num c.votes %></td><td><%= pct(c.votes, candidate_total) %></td></tr>
+    <tr><th scope="row"><%= h(c.person? ? c.name : c.official) %></th><%- unless national? -%><td class="text"><%= c.person? ? h(c.party.to_s.empty? ? 'Independent' : c.party) : '' %></td><%- end -%><td><%= num c.votes %></td><td><%= pct(c.votes, candidate_total) %></td></tr>
   <%- end -%>
   </tbody>
 </table>

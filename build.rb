@@ -45,12 +45,12 @@ def palette_css
   [light.join(" "), dark.join(" ")]
 end
 
-# "GRIGG, Nicola Anna" -> "Nicola Grigg"; "HOWARD, Thomas Edward (Ted)" -> "Ted Howard"
-def display_name(official)
-  surname, given = official.split(", ", 2)
-  return official unless given
-  first = given[/\(([^)]+)\)/, 1] || given.split.first
-  "#{first} #{surname.split(/([ -])/).map(&:capitalize).join}"
+# A short party code for chart labels, from parties.csv, or the party's initials.
+def code(party)
+  return "IND" if party.to_s.empty? || party == "Independent"
+  return PARTIES[party]["code"] unless PARTIES.dig(party, "code").to_s.empty?
+  words = party.scan(/[[:alnum:]]+/).reject { |w| %w[the of and party].include?(w.downcase) }
+  (words.size > 1 ? words.map { |w| w[0] }.join : words.first.to_s)[0, 3].upcase
 end
 
 def page_path(year, slug)
@@ -72,13 +72,24 @@ Candidate = Struct.new(:name, :party, :votes, :approx) do
     SPECIAL_COLUMNS.include?(name)
   end
 
+  # A named candidate, as opposed to a category or a nationwide party column.
+  def person?
+    !special? && name != INDEPENDENTS && name != party
+  end
+
+  # Chart label: the surname as published and a party code, e.g. "GRIGG · NAT".
   def label
+    person? ? "#{name.split(', ', 2).first} · #{code(party)}" : official
+  end
+
+  # The official form, as published: "GRIGG, Nicola Anna (National Party)".
+  def official
     if name == INFORMAL_CANDIDATE then "Informal"
     elsif name == PARTY_VOTE_ONLY then "Party vote only"
     elsif name == NO_ELECTORATE_VOTE then name
     elsif name == INDEPENDENTS then "Independents & others"
     elsif name == party then "#{short(party)} candidates" # nationwide: one column per party
-    else "#{display_name(name)} (#{short(party)})"
+    else "#{name} (#{party.to_s.empty? ? 'Independent' : party})"
     end
   end
 
@@ -88,7 +99,7 @@ Candidate = Struct.new(:name, :party, :votes, :approx) do
     when INFORMAL_CANDIDATE then "cast an informal candidate vote"
     when PARTY_VOTE_ONLY then "cast only a party vote"
     when NO_ELECTORATE_VOTE then "were in Port Waikato, where the electorate poll was cancelled"
-    else "voted for #{label}"
+    else "voted for #{official}"
     end
   end
 end
@@ -107,6 +118,10 @@ Group = Struct.new(:label, :party, :members) do
 
   def phrase
     members.size == 1 ? members.first.phrase : "voted for other candidates or informally"
+  end
+
+  def official
+    members.size == 1 && members.first.respond_to?(:official) ? members.first.official : label
   end
 end
 
@@ -236,7 +251,7 @@ class Result
       c = count(lg.members, group.members)
       [c, "#{pct(c, group.votes)} from #{lg.label} party voters"] if c > 0
     end.compact.sort_by { |v, _| -v }.map(&:last)
-    "#{group.label}: #{approx ? 'about ' : ''}#{num group.votes} votes. #{parts.join(', ')}."
+    "#{group.official}: #{approx ? 'about ' : ''}#{num group.votes} votes. #{parts.join(', ')}."
   end
 
   def chart

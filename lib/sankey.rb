@@ -91,7 +91,7 @@ module Sankey
     anchor = side == :left ? "start" : "end"
     focus = n.aria ? %( tabindex="0" role="img" aria-label="#{h n.aria}") : %( aria-hidden="true")
     <<~NODE.chomp
-      <g class="node" id="#{n.id}"#{focus}>
+      <g class="node #{side}" id="#{n.id}"#{focus}>
         <rect class="bar" x="#{x}" y="#{r n.y}" width="#{BAR}" height="#{r [n.h, 1].max}" style="fill:var(--p-#{n.paint})"/>
         <text x="#{tx}" y="#{r n.label_y}" text-anchor="#{anchor}"><tspan class="name">#{h n.label}</tspan> <tspan class="fig">#{h n.figure}</tspan></text>
       </g>
