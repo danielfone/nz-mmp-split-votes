@@ -1,7 +1,7 @@
 # MMP Split Vote Explorer
 
 How New Zealand voters split their party vote and electorate vote, shown as a
-static Sankey diagram for each electorate. No JavaScript: the chart is SVG
+static Sankey diagram for each election and electorate. No JavaScript: the chart is SVG
 generated at build time, and highlighting uses CSS.
 
 ## Build
@@ -19,7 +19,8 @@ Plain Ruby standard library, no gems.
 - `data/<year>/` holds tidy CSVs containing only published values. Counts are
   derived from published percentages at build time.
 - An election with `flows.csv` gets a Sankey; one without shows totals only.
-- `data/parties.csv` sets each party's short name and colour.
+- `data/parties.csv` sets each party's short name, chart code and
+  colours (light and dark).
 
 Election data © Electoral Commission New Zealand, from
 [electionresults.govt.nz](https://www.electionresults.govt.nz/). Code is MIT

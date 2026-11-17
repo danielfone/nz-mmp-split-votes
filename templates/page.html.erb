@@ -1,4 +1,4 @@
-<%- svg = chart; light, dark = palette_css -%>
+<%- light, dark = palette_css -%>
 <!doctype html>
 <html lang="en-NZ">
 <head>
@@ -138,7 +138,7 @@
 <%- end -%>
 
 <figure class="chart">
-<%= svg %>
+<%= chart %>
 <%- if flows? -%>
   <figcaption>Ribbons between different parties are split votes; faint ribbons stayed with the same party. Hover over, tap or tab to a party or candidate to highlight its votes.</figcaption>
 <%- elsif candidates.any? -%>

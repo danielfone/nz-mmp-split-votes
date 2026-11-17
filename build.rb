@@ -11,7 +11,6 @@ require_relative "lib/sankey"
 OUT = "site"
 MAIN_SHARE = 0.02    # groups below this share are drawn as one "Other" node (the tables keep them all)
 SPLIT_SHARE = 20     # a split is highlighted if at least this % of a main party's voters made it
-EXACT_BELOW = 10_000 # a percentage to 2 d.p. pins down a count exactly only when the row total is under this
 
 def read(path)
   File.exist?(path) ? CSV.read(path, headers: true).map(&:to_h) : nil
@@ -69,7 +68,7 @@ Party = Struct.new(:name, :votes, :cells) do
   end
 end
 
-Candidate = Struct.new(:name, :party, :votes, :approx) do
+Candidate = Struct.new(:name, :party, :votes) do
   def special?
     SPECIAL_COLUMNS.include?(name)
   end
@@ -103,10 +102,9 @@ Candidate = Struct.new(:name, :party, :votes, :approx) do
     else "#{name} (#{party.to_s.empty? ? 'Independent' : party})"
     end
   end
-
 end
 
-Cell = Struct.new(:pct, :count, :exact)
+Cell = Struct.new(:pct, :count)
 
 # A node in the chart: one party or candidate, or several grouped as "Other".
 Group = Struct.new(:label, :party, :members) do
@@ -140,20 +138,18 @@ class Result
   def self.from_rows(election, el, party_rows, flow_rows, candidate_rows)
     parties = party_rows.map { |r| Party.new(r["party"], Integer(r["votes"]), {}) }
     if flow_rows && flow_rows.any?
-      candidates = flow_rows.map { |r| [r["candidate"], r["candidate_party"]] }.uniq.map { |n, p| Candidate.new(n, p, 0, false) }
+      candidates = flow_rows.map { |r| [r["candidate"], r["candidate_party"]] }.uniq.map { |n, p| Candidate.new(n, p, 0) }
       by_name = candidates.map { |c| [c.name, c] }.to_h
       party_by_name = parties.map { |p| [p.name, p] }.to_h
       flow_rows.each do |r|
         party = party_by_name.fetch(r["party"])
         cand = by_name.fetch(r["candidate"])
-        exact = party.votes < EXACT_BELOW
-        cell = Cell.new(r["pct"], (party.votes * r["pct"].to_f / 100).round, exact)
+        cell = Cell.new(r["pct"], (party.votes * r["pct"].to_f / 100).round)
         party.cells[cand.name] = cell
         cand.votes += cell.count
-        cand.approx ||= !exact && cell.count > 0
       end
     else
-      candidates = (candidate_rows || []).map { |r| Candidate.new(r["candidate"], r["party"], Integer(r["votes"]), false) }
+      candidates = (candidate_rows || []).map { |r| Candidate.new(r["candidate"], r["party"], Integer(r["votes"])) }
     end
     new(year: election["year"], status: election["status"], slug: el["slug"], name: el["name"], type: el["type"],
         source: el["source"], note: el["note"], parties: parties, candidates: candidates)
@@ -176,7 +172,7 @@ class Result
     new(year: election["year"], status: election["status"], slug: "national", name: "Nationwide", type: "national",
         source: election["source"], note: "Nationwide totals are the sum of the #{results.size} electorate results.",
         parties: party_votes.map { |n, v| Party.new(n, v, {}) },
-        candidates: cand_votes.map { |(n, p), v| Candidate.new(n, p, v, false) })
+        candidates: cand_votes.map { |(n, p), v| Candidate.new(n, p, v) })
   end
 
   def national?
@@ -231,17 +227,26 @@ class Result
     end
   end
 
-  def chart
-    right = right_groups.each_with_index.map do |g, j|
+  def left_nodes
+    @left_nodes ||= left_groups.each_with_index.map do |g, i|
+      Sankey::Node.new("p#{i}", g.label, g.brief, g.votes, g.paint, flows? ? "#{g.label} party vote" : nil)
+    end
+  end
+
+  def right_nodes
+    @right_nodes ||= right_groups.each_with_index.map do |g, j|
       node = Sankey::Node.new("c#{j}", g.label, g.brief, g.votes, g.paint, flows? ? g.official : nil)
       node.upper = g.members.size == 1 && g.members.first.person? # published surnames are upper case
       node
     end
-    left = left_groups.each_with_index.map do |g, i|
-      Sankey::Node.new("p#{i}", g.label, g.brief, g.votes, g.paint,
-                       flows? ? "#{g.label} party vote" : nil)
-    end
+  end
 
+  def nodes
+    left_nodes + right_nodes
+  end
+
+  def chart
+    left, right = left_nodes, right_nodes
     flows = []
     if flows?
       left_groups.each_with_index do |lg, i|
@@ -255,15 +260,10 @@ class Result
       end
     end
 
-    @nodes = left + right
     # A wide chart, and a narrow one with shorter labels for phones; the page's CSS shows one.
     label = "#{title}: party votes on the left, electorate candidate votes on the right"
     Sankey.render(left: left, right: right, flows: flows, label: label, width: 600, prefix: "w") +
       Sankey.render(left: left, right: right, flows: flows, label: label, width: 360, prefix: "n", short: true)
-  end
-
-  def nodes
-    @nodes
   end
 
   def split_flows
