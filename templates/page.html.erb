@@ -174,8 +174,8 @@
   </div>
 <%- end -%>
 <%- end -%>
-  <figcaption><%= national? ? 'Parties and candidates under 2%, independents and informal votes' : 'Parties under 2% and informal party votes' %> are grouped as “Other”.</figcaption>
-<%- if note -%>
+  <figcaption><%= national? ? 'Parties and candidates under 2%, independents and informal votes' : 'Parties under 2% and informal party votes' %> are grouped as “Other”.<%= " #{h note}" if national? && note %></figcaption>
+<%- if note && !national? -%>
   <p class="note"><%= h note %></p>
 <%- end -%>
 </figure>
