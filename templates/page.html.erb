@@ -77,8 +77,8 @@
   .chart:has(#w-<%= n.id %>:focus, #n-<%= n.id %>:focus) #d-<%= n.id %> { display: block; }
 <%- end -%>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
-  /* The split-vote table can be wider than the text column. */
-  .table-wrap.wide { width: min(1100px, calc(100vw - 40px)); margin-left: calc(50% - min(550px, 50vw - 20px)); }
+  /* The split-vote table is as wide as its columns need: at least the text column, at most the screen (then it scrolls), centred on the column. */
+  .table-wrap.wide { width: max-content; min-width: 100%; max-width: calc(100vw - 32px); position: relative; left: 50%; transform: translateX(-50%); }
   /* Heat map: green for a party's own candidate, red for another party's, each tinted by share (up to 50% strength, so text keeps its contrast). */
   td.same, td.split { background: color-mix(in srgb, var(--heat) var(--h), var(--bg)); }
   td.same { --heat: var(--same); }
@@ -91,7 +91,8 @@
   @media (min-width: 700px) { th[scope=row] { min-width: 13em; } }
   .table-wrap:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   table { border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; width: 100%; }
-  caption { text-align: left; padding: 8px; }
+  /* A caption is as wide as its table; keep it within the scroll box so it doesn't scroll out of view. */
+  caption { text-align: left; padding: 8px; position: sticky; left: 0; max-width: calc(100vw - 34px); }
   th, td { padding: 6px 12px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
   th[scope=row], thead th:first-child, td.text { text-align: left; }
   thead th { vertical-align: bottom; font-weight: 600; }
