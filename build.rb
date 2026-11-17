@@ -103,15 +103,6 @@ Candidate = Struct.new(:name, :party, :votes, :approx) do
     end
   end
 
-  # How a party-vote breakdown refers to this column.
-  def phrase
-    case name
-    when INFORMAL_CANDIDATE then "cast an informal candidate vote"
-    when PARTY_VOTE_ONLY then "cast only a party vote"
-    when NO_ELECTORATE_VOTE then "were in Port Waikato, where the electorate poll was cancelled"
-    else "voted for #{official}"
-    end
-  end
 end
 
 Cell = Struct.new(:pct, :count, :exact)
@@ -124,10 +115,6 @@ Group = Struct.new(:label, :party, :members) do
 
   def paint
     party.to_s.empty? ? "grey" : paint_for(party)
-  end
-
-  def phrase
-    members.size == 1 ? members.first.phrase : "voted for other candidates or informally"
   end
 
   def official
@@ -243,41 +230,15 @@ class Result
     end
   end
 
-  # Sentence describing how one party's (or group's) voters cast their candidate vote.
-  def party_sentence(label, members, columns)
-    votes = members.sum(&:votes)
-    parts = columns.map do |g|
-      if members.size == 1 && g.members.size == 1
-        cell = members.first.cells[g.members.first.name]
-        next if cell.nil? || cell.pct.to_f.zero?
-        [cell.pct.to_f, "#{cell.pct}% #{g.phrase}"]
-      else
-        c = count(members, g.members)
-        next if c.zero?
-        [100.0 * c / votes, "#{pct(c, votes, 2)} #{g.phrase}"]
-      end
-    end.compact.sort_by { |v, _| -v }.map(&:last)
-    "#{label}: #{num votes} party votes. #{parts.join(', ')}."
-  end
-
-  def candidate_sentence(group)
-    approx = group.members.any?(&:approx)
-    parts = left_groups.map do |lg|
-      c = count(lg.members, group.members)
-      [c, "#{pct(c, group.votes)} from #{lg.label} party voters"] if c > 0
-    end.compact.sort_by { |v, _| -v }.map(&:last)
-    "#{group.official}: #{approx ? 'about ' : ''}#{num group.votes} votes. #{parts.join(', ')}."
-  end
-
   def chart
     right = right_groups.each_with_index.map do |g, j|
-      node = Sankey::Node.new("c#{j}", g.label, g.brief, g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
+      node = Sankey::Node.new("c#{j}", g.label, g.brief, g.votes, g.paint, flows? ? g.official : nil)
       node.upper = g.members.size == 1 && g.members.first.person? # published surnames are upper case
       node
     end
     left = left_groups.each_with_index.map do |g, i|
       Sankey::Node.new("p#{i}", g.label, g.brief, g.votes, g.paint,
-                       flows? ? party_sentence(g.label, g.members, right_groups) : nil)
+                       flows? ? "#{g.label} party vote" : nil)
     end
 
     flows = []

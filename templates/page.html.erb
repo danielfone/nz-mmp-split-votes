@@ -55,15 +55,10 @@
   .sankey .node:is(:hover, :focus) .bar { stroke: var(--ink); stroke-width: 2; }
   .sankey .node:focus-visible text { text-decoration: underline; }
   .note { margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); }
-  .panel { min-height: 6.5em; margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-radius: 4px; }
-  .panel p { margin: 0; }
-  .panel p:not(.d-default) { display: none; }
-  .d-default { color: var(--muted); }
-  .chart:has(.node:is(:hover, :focus)) .d-default { display: none; }
+  figcaption { margin: 8px 0 0; color: var(--muted); font-size: .9375rem; }
 <%- nodes.select(&:aria).each do |n| -%>
   .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f:not(.<%= n.id %>) { opacity: .05; }
   .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f.<%= n.id %> { opacity: .8; }
-  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) #d-<%= n.id %> { display: block; }
 <%- end -%>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
   /* The split-vote table can be wider than the text column. */
@@ -123,7 +118,7 @@
 <h1><%= h title %></h1>
 <%- if flows? -%>
 <p class="status"><%= status.capitalize %> results · split votes published</p>
-<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
+<p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
 <%- if top_splits.any? -%>
 <ul class="splits">
 <%- top_splits.each do |share, party, cand| -%>
@@ -133,20 +128,15 @@
 <%- end -%>
 <%- elsif candidates.any? -%>
 <p class="status"><%= status.capitalize %> count · split votes not yet published</p>
-<p class="lede">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>
+<p class="lede" id="summary">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>
 <%- else -%>
-<p class="status"><%= status.capitalize %> results · party votes only</p>
+<p class="status" id="summary"><%= status.capitalize %> results · party votes only</p>
 <%- end -%>
 
 <figure class="chart">
 <%= svg %>
 <%- if flows? -%>
-  <div class="panel" aria-hidden="true">
-    <p class="d-default">Hover over, tap or tab to a party or candidate to see where its votes went. Ribbons between different parties are the split votes; faint ribbons stayed with the same party.</p>
-  <%- nodes.each do |n| -%>
-    <p id="d-<%= n.id %>"><%= h n.aria %></p>
-  <%- end -%>
-  </div>
+  <figcaption>Ribbons between different parties are split votes; faint ribbons stayed with the same party. Hover over, tap or tab to a party or candidate to highlight its votes.</figcaption>
 <%- elsif candidates.any? -%>
   <p class="note">Bars show each column's own total: <%= num party_total %> party votes and <%= num candidate_total %> candidate votes. The totals differ because party and candidate votes are counted, and ruled informal, separately.</p>
 <%- end -%>

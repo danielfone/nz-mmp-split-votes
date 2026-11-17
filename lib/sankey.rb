@@ -30,7 +30,7 @@ module Sankey
     height = columns.map { |col| [col.last.y + col.last.h, col.last.label_y + 6].max }.max
 
     <<~SVG
-      <svg class="sankey sankey-#{prefix}" viewBox="0 0 #{width} #{height.ceil}" role="group" aria-label="#{h label}">
+      <svg class="sankey sankey-#{prefix}" viewBox="0 0 #{width} #{height.ceil}" role="group" aria-label="#{h label}" aria-describedby="summary">
         <defs>
       #{gradients(flows, width, prefix).join("\n")}
         </defs>
