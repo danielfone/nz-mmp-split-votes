@@ -85,8 +85,7 @@ Candidate = Struct.new(:name, :party, :votes) do
 
   # A shorter chart label for narrow screens.
   def brief
-    if name == party then short(party)
-    elsif name == INDEPENDENTS then "Independents"
+    if name == INDEPENDENTS then "Independents"
     elsif name == NO_ELECTORATE_VOTE then "Port Waikato"
     else label
     end
