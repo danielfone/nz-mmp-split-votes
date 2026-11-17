@@ -7,13 +7,14 @@
 <title><%= h title %> · New Zealand MMP Split-Vote Explorer</title>
 <link rel="canonical" href="<%= page_path(year, slug) %>">
 <style>
+  /* --panel is set apart from --bg (more so in dark mode, where small steps are harder to see) while keeping --muted text on it at 4.5:1 or better. */
   :root {
-    --ink: #1b1f24; --muted: #5c6670; --line: #d8dde2; --bg: #ffffff; --panel: #f2f4f6; --link: #1f5fa8; --same: #009e73; --split: #d55e00;
+    --ink: #1b1f24; --muted: #5c6670; --line: #d8dde2; --bg: #ffffff; --panel: #e8ebee; --link: #1f5fa8; --same: #009e73; --split: #d55e00;
     <%= light %>
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #444b52; --link: #7fb2ec; --same: #3fc4a0; --split: #f0884a; <%= dark %> }
+    :root { --ink: #e6e9ec; --muted: #a9b2ba; --line: #343a40; --bg: #15181b; --panel: #383f46; --link: #7fb2ec; --same: #3fc4a0; --split: #f0884a; <%= dark %> }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -55,7 +56,7 @@
   .shares .key { display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .3em; }
   .shares .same { background: var(--same); }
   .shares .split { background: var(--split); }
-  .shares .other { background: color-mix(in srgb, var(--muted) 40%, var(--panel)); }
+  .shares .other { background: color-mix(in srgb, var(--muted) 65%, var(--panel)); }
   figure { margin: 0; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
   .sankey-n { display: none; }
