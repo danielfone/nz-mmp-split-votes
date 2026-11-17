@@ -45,7 +45,7 @@
   h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
   h2 { font-size: 1.2rem; margin: 32px 0 8px; }
   h3 { font-size: 1rem; margin: 12px 0 4px; }
-  .status { color: var(--muted); margin: 0 0 16px; text-align: center; }
+  .status { color: var(--muted); margin: 0 0 8px; }
   .lede { font-size: 1.1rem; margin: 0 0 8px; }
   .splits { margin: 0 0 16px; padding-left: 1.5em; }
   .splits li { margin: 0 0 2px; }
@@ -147,7 +147,6 @@
 </div>
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
-<p class="status"><%= status.capitalize %> results · split votes published</p>
 <p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
 <%- if top_splits.any? -%>
 <ul class="splits">
@@ -157,11 +156,9 @@
 </ul>
 <%- end -%>
 <%- elsif candidates.any? -%>
-<p class="status"><%= status.capitalize %> count · split votes not yet published</p>
 <p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
-<%- else -%>
-<p class="status" id="summary"><%= status.capitalize %> results · party votes only</p>
 <%- end -%>
+<%- status_line = flows? ? "#{status.capitalize} results · split votes published" : candidates.any? ? "#{status.capitalize} count · split votes not yet published" : "#{status.capitalize} results · party votes only" -%>
 
 <figure class="chart">
 <%- if flows? -%>
@@ -192,6 +189,7 @@
 
 <%- if flows? -%>
 <h2>All Figures</h2>
+<p class="status"><%= status_line %></p>
 <div class="table-wrap wide" tabindex="0" role="region" aria-labelledby="table-caption">
 <table>
   <caption id="table-caption">
@@ -232,6 +230,7 @@
 </div>
 <%- else -%>
 <h2>All Figures</h2>
+<p class="status"<%= ' id="summary"' unless candidates.any? %>><%= status_line %></p>
 <div class="table-wrap" tabindex="0" role="region" aria-labelledby="party-caption">
 <table>
   <caption id="party-caption">Party votes, <%= h title %> (<%= status %>)</caption>
