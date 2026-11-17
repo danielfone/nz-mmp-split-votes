@@ -192,7 +192,7 @@
     <tr>
       <th scope="col">Party vote</th>
       <th scope="col">Voters</th>
-    <%- candidates.each do |c| -%>
+    <%- table_candidates.each do |c| -%>
       <%- if c.person? -%>
       <%- surname, given = c.name.split(", ", 2) -%>
       <th scope="col"><span class="line surname"><%= h surname %></span> <span class="line"><%= h given %></span> <span class="line party"><%= h(c.party.to_s.empty? ? "Independent" : c.party) %></span></th>
@@ -207,7 +207,7 @@
     <tr>
       <th scope="row"><%= h p.label %></th>
       <td><%= num p.votes %></td>
-    <%- candidates.each do |c| cell = p.cells[c.name]; heat = heat(p, c) -%>
+    <%- table_candidates.each do |c| cell = p.cells[c.name]; heat = heat(p, c) -%>
       <%- if heat == :same -%>
       <td class="same"><%= cell.pct %>%</td>
       <%- elsif heat -%>

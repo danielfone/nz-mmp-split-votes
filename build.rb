@@ -266,6 +266,15 @@ class Result
       Sankey.render(left: left, right: right, flows: flows, label: label, width: 360, prefix: "n", short: true)
   end
 
+  # Table columns in row order, so each party's own candidate falls on a diagonal: candidates
+  # whose party has a row, then everyone else by votes, then the categories.
+  def table_candidates
+    rank = @parties.each_with_index.map { |p, i| [p.name, i] }.to_h
+    special, others = @candidates.partition(&:special?)
+    matched, unmatched = others.partition { |c| rank.key?(c.party) }
+    matched.sort_by { |c| [rank[c.party], -c.votes] } + unmatched + special
+  end
+
   def split_flows
     @parties.reject(&:informal?).flat_map do |p|
       @candidates.reject { |c| c.special? || c.party == p.name }.map { |c| [p.cells[c.name] ? p.cells[c.name].count : 0, p, c] }
