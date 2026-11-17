@@ -291,9 +291,9 @@ class Result
     end
   end
 
-  # The largest group of voters who backed one party but a different party's candidate.
-  def biggest_split
-    split_flows.max_by(&:first)
+  # The largest groups of voters who backed one party but a different party's candidate.
+  def top_splits(n = 5)
+    split_flows.select { |count, _, _| count > 0 }.sort_by { |count, _, _| -count }.first(n)
   end
 
   def split_share
