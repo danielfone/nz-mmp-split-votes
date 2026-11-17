@@ -23,7 +23,7 @@
   .site { display: inline-block; color: var(--ink); text-decoration: none; line-height: 1.1; }
   .site span { display: block; }
   .site .kicker { font-size: .8125rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-  .site .name { font-size: 2.25rem; font-weight: 700; letter-spacing: -.01em; }
+  .site .name { font-size: 1.75rem; font-weight: 700; letter-spacing: -.01em; }
   .switch { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 0 4px; margin: 0 -4px; cursor: pointer; text-decoration: underline dotted var(--muted); text-decoration-thickness: 2px; text-underline-offset: 6px; }
   .switch:hover { background: var(--panel); }
   .switch:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
@@ -32,19 +32,20 @@
   .menu::backdrop { background: rgb(0 0 0 / .35); }
   .menu h2 { margin: 0 0 8px; }
   .menu a[aria-current] { font-weight: 700; color: var(--ink); text-decoration: none; }
-  .year-nav { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 20px 0 0; font-size: 1.25rem; font-weight: 600; }
-  .year-nav a, .year-nav .off { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; font-size: 1.6rem; line-height: 1; text-decoration: none; }
+  .year-nav { display: flex; justify-content: center; align-items: center; gap: 12px; margin: 20px 0 0; font-size: 2.5rem; font-weight: 700; line-height: 1.1; }
+  .year-nav a, .year-nav .off { display: inline-flex; align-items: center; justify-content: center; width: 48px; height: 48px; padding-bottom: 4px; border-radius: 24px; font-size: 2.25rem; font-weight: 400; text-decoration: none; }
   .year-nav a:hover { background: var(--panel); }
   .year-nav .off { color: var(--line); cursor: default; }
-  .place { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 16px; margin: 4px 0 16px; }
-  .place .nationwide { font-size: 1.05rem; }
+  .place { margin: 8px 0 4px; text-align: center; }
+  .place .nationwide { display: block; font-size: .9375rem; }
+  .place span.nationwide { visibility: hidden; }
   .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .electorates { columns: 3 11em; gap: 16px; padding: 0; margin: 4px 0 12px; list-style: none; font-size: .9375rem; }
   .electorates li { break-inside: avoid; }
   h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
   h2 { font-size: 1.2rem; margin: 32px 0 8px; }
   h3 { font-size: 1rem; margin: 12px 0 4px; }
-  .status { color: var(--muted); margin: 0 0 16px; }
+  .status { color: var(--muted); margin: 0 0 16px; text-align: center; }
   .lede { font-size: 1.1rem; margin: 0 0 8px; }
   .splits { margin: 0 0 16px; padding-left: 1.5em; }
   .splits li { margin: 0 0 2px; }
@@ -134,10 +135,12 @@
 </nav>
 <%# The electorate name opens the electorate menu. The chevron is hidden so the heading reads "Selwyn 2023". %>
 <div class="place">
-<h1><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button><span class="vh"> <%= year %></span></h1>
-<%- unless national? -%>
+<%- if national? -%>
+<span class="nationwide" aria-hidden="true">Nationwide</span><%# keeps the layout the same as electorate pages %>
+<%- else -%>
 <a class="nationwide" href="<%= page_path(year, 'national') %>">Nationwide</a>
 <%- end -%>
+<h1><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button><span class="vh"> <%= year %></span></h1>
 </div>
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
