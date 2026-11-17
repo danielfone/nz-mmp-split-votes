@@ -1,0 +1,210 @@
+<%- svg = chart; light, dark = palette_css -%>
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= h title %> · MMP Explorer</title>
+<link rel="canonical" href="<%= page_path(year, slug) %>">
+<style>
+  :root {
+    --ink: #1b1f24; --muted: #5c6670; --line: #d8dde2; --bg: #ffffff; --panel: #f2f4f6; --link: #1f5fa8;
+    <%= light %>
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #22272c; --link: #7fb2ec; <%= dark %> }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  a { color: var(--link); }
+  main, header, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding-top: 16px; }
+  header .site { font-weight: 700; text-decoration: none; color: var(--ink); }
+  nav.years { display: flex; gap: 12px; }
+  nav.years a[aria-current] { font-weight: 700; color: var(--ink); text-decoration: none; }
+  .picker summary { cursor: pointer; color: var(--link); }
+  .picker[open] { flex-basis: 100%; }
+  .electorates { columns: 3 11em; gap: 16px; padding: 0; margin: 4px 0 12px; list-style: none; font-size: .9375rem; }
+  .electorates li { break-inside: avoid; }
+  h1 { font-size: 1.9rem; line-height: 1.2; margin: 16px 0 4px; }
+  h2 { font-size: 1.2rem; margin: 32px 0 8px; }
+  h3 { font-size: 1rem; margin: 12px 0 4px; }
+  .status { color: var(--muted); margin: 0 0 16px; }
+  .lede { font-size: 1.1rem; margin: 0 0 16px; }
+  figure { margin: 0; }
+  .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
+  .sankey .f { opacity: .6; transition: opacity .15s; }
+  .sankey .f.same { opacity: .16; }
+  .sankey text { font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
+  .sankey .name { font-weight: 600; }
+  .sankey .fig { fill: var(--muted); }
+  .sankey .node[tabindex] { cursor: pointer; outline: none; }
+  .sankey .node:is(:hover, :focus) .bar { stroke: var(--ink); stroke-width: 2; }
+  .sankey .node:focus-visible text { text-decoration: underline; }
+  .note { margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); }
+  .panel { min-height: 6.5em; margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-radius: 4px; }
+  .panel p { margin: 0; }
+  .panel p:not(.d-default) { display: none; }
+  .d-default { color: var(--muted); }
+  .chart:has(.node:is(:hover, :focus)) .d-default { display: none; }
+<%- nodes.select(&:aria).each do |n| -%>
+  .chart:has(#<%= n.id %>:is(:hover, :focus)) .f:not(.<%= n.id %>) { opacity: .05; }
+  .chart:has(#<%= n.id %>:is(:hover, :focus)) .f.<%= n.id %> { opacity: .8; }
+  .chart:has(#<%= n.id %>:is(:hover, :focus)) #d-<%= n.id %> { display: block; }
+<%- end -%>
+  .breakdown { padding-left: 0; list-style: none; }
+  .breakdown li { margin: 0 0 8px; }
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
+  .table-wrap:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  table { border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; width: 100%; }
+  caption { text-align: left; padding: 8px; font-weight: 600; }
+  th, td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
+  th[scope=row], thead th:first-child, td.text { text-align: left; }
+  thead th { vertical-align: bottom; font-weight: 600; }
+  td small { display: block; color: var(--muted); }
+  footer { margin-top: 40px; padding-bottom: 32px; color: var(--muted); font-size: .875rem; border-top: 1px solid var(--line); }
+  footer a { color: inherit; }
+  @media (forced-colors: active) { .sankey { forced-color-adjust: none; } }
+  @media (prefers-reduced-motion: reduce) { .sankey .f { transition: none; } }
+</style>
+</head>
+<body>
+<%- lists = electorate_lists(year) -%>
+<header>
+  <a class="site" href="/">MMP Explorer</a>
+  <nav class="years" aria-label="Election year">
+  <%- year_links(self).each do |y, st, href| -%>
+    <a href="<%= href %>"<%= ' aria-current="page"' if y == year %>><%= y %><%= ' (preliminary)' if st == 'preliminary' %></a>
+  <%- end -%>
+  </nav>
+  <%- unless national? -%>
+  <details class="picker">
+    <summary><%= year %> electorates</summary>
+    <a href="<%= page_path(year, 'national') %>">Nationwide</a>
+    <%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
+    <h3><%= heading %></h3>
+    <ul class="electorates">
+    <%- lists[type].to_a.each do |r| -%>
+      <li><a href="<%= page_path(year, r.slug) %>"<%= ' aria-current="page"' if r.slug == slug %>><%= h r.name %></a></li>
+    <%- end -%>
+    </ul>
+    <%- end -%>
+  </details>
+  <%- end -%>
+</header>
+<main>
+<h1><%= h title %></h1>
+<%- if flows? -%>
+<p class="status"><%= status.capitalize %> results · split votes published</p>
+<%- votes, party, cand = biggest_split -%>
+<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party. The biggest group: <strong><%= num votes %> <%= h party.label %> party voters chose <%= h cand.label %></strong>.</p>
+<%- elsif candidates.any? -%>
+<p class="status"><%= status.capitalize %> count · split votes not yet published</p>
+<p class="lede">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>
+<%- else -%>
+<p class="status"><%= status.capitalize %> results · party votes only</p>
+<%- end -%>
+
+<figure class="chart">
+<%= svg %>
+<%- if flows? -%>
+  <div class="panel" aria-hidden="true">
+    <p class="d-default">Hover over, tap or tab to a party or candidate to see where its votes went. Ribbons between different parties are the split votes; faint ribbons stayed with the same party.</p>
+  <%- nodes.each do |n| -%>
+    <p id="d-<%= n.id %>"><%= h n.aria %></p>
+  <%- end -%>
+  </div>
+<%- elsif candidates.any? -%>
+  <p class="note">Bars show each column's own total: <%= num party_total %> party votes and <%= num candidate_total %> candidate votes. The totals differ because party and candidate votes are counted, and ruled informal, separately.</p>
+<%- end -%>
+<%- if note -%>
+  <p class="note"><%= h note %></p>
+<%- end -%>
+</figure>
+
+<%- if national? -%>
+<h2><%= year %> electorates</h2>
+<%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
+<h3><%= heading %></h3>
+<ul class="electorates">
+<%- lists[type].to_a.each do |r| -%>
+  <li><a href="<%= page_path(year, r.slug) %>"><%= h r.name %></a></li>
+<%- end -%>
+</ul>
+<%- end -%>
+<%- end -%>
+
+<%- if flows? -%>
+<h2>By party vote</h2>
+<ul class="breakdown">
+<%- parties.each do |p| label, rest = party_sentence(p.label, [p], candidate_columns).split(": ", 2) -%>
+  <li><strong><%= h label %></strong>: <%= h rest %></li>
+<%- end -%>
+</ul>
+
+<h2>All figures</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="table-caption">
+<table>
+  <caption id="table-caption">Electorate vote by party vote, <%= h title %>. Percentages are of each party's voters.</caption>
+  <thead>
+    <tr>
+      <th scope="col">Party vote</th>
+      <th scope="col">Voters</th>
+    <%- candidates.each do |c| -%>
+      <th scope="col"><%= h c.label %></th>
+    <%- end -%>
+    </tr>
+  </thead>
+  <tbody>
+  <%- parties.each do |p| -%>
+    <tr>
+      <th scope="row"><%= h p.label %></th>
+      <td><%= num p.votes %></td>
+    <%- candidates.each do |c| cell = p.cells[c.name] -%>
+      <td><%= cell.pct %>%<small><%= cell.exact ? '' : '≈' %><%= num cell.count %></small></td>
+    <%- end -%>
+    </tr>
+  <%- end -%>
+  </tbody>
+</table>
+</div>
+<%- else -%>
+<h2>All figures</h2>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="party-caption">
+<table>
+  <caption id="party-caption">Party votes, <%= h title %> (<%= status %>)</caption>
+  <thead><tr><th scope="col">Party</th><th scope="col">Votes</th><th scope="col">Share</th></tr></thead>
+  <tbody>
+  <%- parties.each do |p| -%>
+    <tr><th scope="row"><%= h p.informal? ? p.label : p.name %></th><td><%= num p.votes %></td><td><%= pct(p.votes, party_total) %></td></tr>
+  <%- end -%>
+  </tbody>
+</table>
+</div>
+<%- if candidates.any? -%>
+<div class="table-wrap" tabindex="0" role="region" aria-labelledby="candidate-caption">
+<table>
+  <caption id="candidate-caption">Candidate votes<%= ' by party' if national? %>, <%= h title %> (<%= status %>)</caption>
+  <thead><tr><th scope="col">Candidate</th><%- unless national? -%><th scope="col">Party</th><%- end -%><th scope="col">Votes</th><th scope="col">Share</th></tr></thead>
+  <tbody>
+  <%- candidates.each do |c| -%>
+    <tr><th scope="row"><%= h(c.special? || national? ? c.label : display_name(c.name)) %></th><%- unless national? -%><td class="text"><%= c.special? ? '' : h(short(c.party)) %></td><%- end -%><td><%= num c.votes %></td><td><%= pct(c.votes, candidate_total) %></td></tr>
+  <%- end -%>
+  </tbody>
+</table>
+</div>
+<%- end -%>
+<%- end -%>
+</main>
+<footer>
+  <p>Source: Electoral Commission, <a href="<%= source %>"><%= source.sub(%r{\Ahttps?://}, '') %></a>.
+  <%- if flows? -%>
+  The Commission publishes split votes as percentages to two decimal places. Counts here are derived from those percentages and each party's total; counts marked ≈ may differ from the true figure by a few votes.
+  <%- elsif status == 'preliminary' -%>
+  These are preliminary figures and will change when the official count is published.
+  <%- end -%>
+  Data © Electoral Commission New Zealand. Site code MIT licensed.</p>
+</footer>
+</body>
+</html>
