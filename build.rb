@@ -325,9 +325,8 @@ class Result
       ["p#{i}", voters_heading(lg), *listed(rows)]
     end
     right = right_groups.each_with_index.map do |rg, j|
-      of = rg.members.any?(&:special?) || rg.label.start_with?("Other") ? "from" : "of their votes from"
-      rows = left_groups.each_with_index.map { |lg, i| [100.0 * counts[i][j] / rg.votes, "#{of} #{voters_from(lg)}"] }
-      ["c#{j}", received_heading(rg), *listed(rows)]
+      rows = left_groups.each_with_index.map { |lg, i| [100.0 * counts[i][j] / rg.votes, "from #{voters_from(lg)}"] }
+      ["c#{j}", votes_heading(rg), *listed(rows)]
     end
     left + right
   end
@@ -347,18 +346,18 @@ class Result
     lg.label.start_with?("Other") ? "other parties' voters or informal party votes" : "#{lg.label} party voters"
   end
 
-  def received_heading(rg)
+  def votes_heading(rg)
     return "Other candidates and informal votes:" if rg.label.start_with?("Other")
     c = rg.members.first
     case c.name
     when INFORMAL_CANDIDATE then "Informal electorate votes:"
     when PARTY_VOTE_ONLY then "Ballots with only a party vote:"
     when NO_ELECTORATE_VOTE then "Port Waikato party votes (no electorate vote):"
-    when INDEPENDENTS then "Independents and others received:"
-    when c.party then "#{short(c.party)} candidates received:"
+    when INDEPENDENTS then "Votes for independents and others:"
+    when c.party then "Votes for #{short(c.party)} candidates:"
     else
       surname, given = c.name.split(", ", 2)
-      "#{[given, surname].compact.join(' ')} (#{short(c.party)}) received:"
+      "Votes for #{[given, surname].compact.join(' ')} (#{short(c.party)}):"
     end
   end
 
