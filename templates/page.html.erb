@@ -66,6 +66,7 @@
   th, td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
   th[scope=row], thead th:first-child, td.text { text-align: left; }
   thead th { vertical-align: bottom; font-weight: 600; }
+  th[scope=row], thead th:first-child { position: sticky; left: 0; z-index: 1; background: var(--bg); }
   footer { margin-top: 40px; padding-bottom: 32px; color: var(--muted); font-size: .875rem; border-top: 1px solid var(--line); }
   footer a { color: inherit; }
   @media (forced-colors: active) { .sankey { forced-color-adjust: none; } }
