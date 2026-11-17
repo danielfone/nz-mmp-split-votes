@@ -50,6 +50,7 @@
   .splits { margin: 0 0 16px; padding-left: 1.5em; }
   .splits li { margin: 0 0 2px; }
   figure { margin: 0; }
+  .hint { margin: 16px 0 4px; color: var(--muted); font-size: .9375rem; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
   .sankey-n { display: none; }
   @media (max-width: 560px) { .sankey-w { display: none; } .sankey-n { display: block; } }
@@ -161,6 +162,9 @@
 <%- end -%>
 
 <figure class="chart">
+<%- if flows? -%>
+  <p class="hint">Select a party or candidate for details.</p>
+<%- end -%>
 <%= chart %>
 <%- if flows? -%>
 <%- descriptions.each do |id, heading, rows, rest| -%>
