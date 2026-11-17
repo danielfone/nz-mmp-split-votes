@@ -271,12 +271,12 @@ class Result
 
   def chart
     right = right_groups.each_with_index.map do |g, j|
-      node = Sankey::Node.new("c#{j}", g.label, g.brief, pct(g.votes, candidate_total), g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
+      node = Sankey::Node.new("c#{j}", g.label, g.brief, g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
       node.upper = g.members.size == 1 && g.members.first.person? # published surnames are upper case
       node
     end
     left = left_groups.each_with_index.map do |g, i|
-      Sankey::Node.new("p#{i}", g.label, g.brief, pct(g.votes, party_total), g.votes, g.paint,
+      Sankey::Node.new("p#{i}", g.label, g.brief, g.votes, g.paint,
                        flows? ? party_sentence(g.label, g.members, right_groups) : nil)
     end
 
