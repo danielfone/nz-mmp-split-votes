@@ -10,7 +10,7 @@ require_relative "lib/sankey"
 
 OUT = "site"
 MAIN_SHARE = 0.02    # groups below this share are drawn as one "Other" node (the tables keep them all)
-SPLIT_SHARE = 20     # a split is highlighted if at least this % of a main party's voters made it
+SPLIT_SHARE = 20     # a split cell is bold in the table if at least this % of the party's voters made it
 
 def read(path)
   File.exist?(path) ? CSV.read(path, headers: true).map(&:to_h) : nil
@@ -278,16 +278,6 @@ class Result
     @parties.reject(&:informal?).flat_map do |p|
       @candidates.reject { |c| c.special? || c.party == p.name }.map { |c| [p.cells[c.name] ? p.cells[c.name].count : 0, p, c] }
     end
-  end
-
-  # The strongest splits: where at least SPLIT_SHARE of a main party's voters backed
-  # another party's candidate, ranked by that share. Returns [share, party, candidate].
-  def top_splits(n = 3)
-    main = @parties.reject(&:informal?).select { |p| p.votes >= MAIN_SHARE * party_total }
-    main.flat_map do |p|
-      @candidates.reject { |c| c.special? || c.party == p.name || p.cells[c.name].nil? }
-                 .map { |c| [p.cells[c.name].pct.to_f, p, c] }
-    end.select { |share, _, _| share >= SPLIT_SHARE }.sort_by { |share, _, _| -share }.first(n)
   end
 
   # How a table cell is shaded: [:same, share] for a party's own candidate (the diagonal),

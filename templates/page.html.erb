@@ -47,8 +47,6 @@
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 8px; }
   .lede { font-size: 1.1rem; margin: 0 0 8px; }
-  .splits { margin: 0 0 16px; padding-left: 1.5em; }
-  .splits li { margin: 0 0 2px; }
   figure { margin: 0; }
   .hint { margin: 8px 0 4px; color: var(--muted); font-size: .9375rem; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
@@ -148,13 +146,6 @@
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
 <p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
-<%- if top_splits.any? -%>
-<ul class="splits">
-<%- top_splits.each do |share, party, cand| -%>
-  <li><strong><%= share.round %>%</strong> of <%= h party.label %> party voters chose <%= h split_target(cand) %></li>
-<%- end -%>
-</ul>
-<%- end -%>
 <%- elsif candidates.any? -%>
 <p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
 <%- end -%>
