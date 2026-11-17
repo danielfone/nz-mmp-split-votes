@@ -40,16 +40,16 @@ module Sankey
     SVG
   end
 
-  # Positions bars top to bottom, then nudges labels apart so they never overlap.
+  # Positions bars top to bottom, keeping them to scale. Where small bars are crowded,
+  # the gaps between them widen so each label sits level with its own bar.
   def stack(col, k)
-    y = 0.0
+    prev = nil
     col.each do |n|
-      n.y = y
       n.h = n.value * k
-      n.label_y = y + n.h / 2 + 5
-      y += n.h + GAP
+      n.y = prev ? [prev.y + prev.h + GAP, prev.y + prev.h / 2 + LINE - n.h / 2].max : [0.0, LINE / 2.0 - n.h / 2].max
+      n.label_y = n.y + n.h / 2 + 5
+      prev = n
     end
-    col.each_cons(2) { |a, b| b.label_y = [b.label_y, a.label_y + LINE].max }
   end
 
   # One horizontal gradient per colour pair, spanning the whole chart, shared by every ribbon with that pair.
