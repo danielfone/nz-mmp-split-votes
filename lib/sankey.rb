@@ -19,6 +19,7 @@ module Sankey
   GAP = 6         # vertical gap between bars
   LINE = 17       # minimum distance between label baselines
   HEIGHT = 460    # height available for bars
+  HEAD = 24       # space above the bars for the column headings
 
   module_function
 
@@ -27,18 +28,24 @@ module Sankey
     # Both columns share one scale so a ribbon is the same thickness at each end.
     k = columns.map { |col| (HEIGHT - GAP * (col.size - 1)).to_f / col.sum(&:value) }.min
     columns.each { |col| stack(col, k) }
-    height = columns.map { |col| [col.last.y + col.last.h, col.last.label_y + 6].max }.max
+    height = columns.map { |col| [col.last.y + col.last.h, col.last.label_y + 6].max }.max + HEAD
+    heads = []
+    heads << %(<text class="head" x="0" y="13">Party Vote</text>) if left.any?
+    heads << %(<text class="head" x="#{width}" y="13" text-anchor="end">Electorate Vote</text>) if right.any?
 
     <<~SVG
       <svg class="sankey sankey-#{prefix}" viewBox="0 0 #{width} #{height.ceil}" role="group" aria-label="#{h label}" aria-describedby="summary">
         <defs>
       #{gradients(flows, width, prefix).join("\n")}
         </defs>
+        <g aria-hidden="true">#{heads.join}</g>
+        <g transform="translate(0,#{HEAD})">
         <g class="flows" aria-hidden="true">
       #{ribbons(left, right, flows, k, width, prefix).join("\n")}
         </g>
       #{left.map { |n| node(n, 0, :left, prefix, short) }.join("\n")}
       #{right.map { |n| node(n, width - BAR, :right, prefix, short) }.join("\n")}
+        </g>
       </svg>
     SVG
   end
