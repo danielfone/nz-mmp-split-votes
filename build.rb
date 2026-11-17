@@ -242,7 +242,7 @@ class Result
   end
 
   def nodes
-    left_nodes + right_nodes
+    (left_nodes + right_nodes).each { |n| n.desc = "d-#{n.id}" if flows? }
   end
 
   def chart
@@ -304,6 +304,64 @@ class Result
       others > 1 ? "the independent candidate #{cand.name.split(', ').first}" : "the independent candidate"
     else
       "the #{short(cand.party)} candidate"
+    end
+  end
+
+  # What each chart node's votes did, shown when the node is selected.
+  # Returns [id, heading, [[whole-number share, text], ...], whether smaller shares were left out].
+  def descriptions
+    return [] unless flows?
+    counts = left_groups.map { |lg| right_groups.map { |rg| count(lg.members, rg.members) } }
+    left = left_groups.each_with_index.map do |lg, i|
+      rows = right_groups.each_with_index.map { |rg, j| [100.0 * counts[i][j] / lg.votes, chose(rg)] }
+      ["p#{i}", voters_heading(lg), *listed(rows)]
+    end
+    right = right_groups.each_with_index.map do |rg, j|
+      of = rg.members.any?(&:special?) || rg.label.start_with?("Other") ? "from" : "of their votes from"
+      rows = left_groups.each_with_index.map { |lg, i| [100.0 * counts[i][j] / rg.votes, "#{of} #{voters_from(lg)}"] }
+      ["c#{j}", received_heading(rg), *listed(rows)]
+    end
+    left + right
+  end
+
+  # Shares that round to at least 1%, largest first, and whether any smaller ones were left out.
+  def listed(rows)
+    rows = rows.sort_by { |share, _| -share }
+    shown = rows.select { |share, _| share.round >= 1 }
+    [shown.map { |share, text| [share.round, text] }, rows.size > shown.size && rows.any? { |share, _| share > 0 && share.round < 1 }]
+  end
+
+  def voters_heading(lg)
+    lg.label.start_with?("Other") ? "Voters for other parties, and informal party votes:" : "#{lg.label} party voters:"
+  end
+
+  def voters_from(lg)
+    lg.label.start_with?("Other") ? "other parties' voters or informal party votes" : "#{lg.label} party voters"
+  end
+
+  def received_heading(rg)
+    return "Other candidates and informal votes:" if rg.label.start_with?("Other")
+    c = rg.members.first
+    case c.name
+    when INFORMAL_CANDIDATE then "Informal electorate votes:"
+    when PARTY_VOTE_ONLY then "Ballots with only a party vote:"
+    when NO_ELECTORATE_VOTE then "Port Waikato party votes (no electorate vote):"
+    when INDEPENDENTS then "Independents and others received:"
+    when c.party then "#{short(c.party)} candidates received:"
+    else
+      surname, given = c.name.split(", ", 2)
+      "#{[given, surname].compact.join(' ')} (#{short(c.party)}) received:"
+    end
+  end
+
+  def chose(rg)
+    return "chose other candidates or voted informally" if rg.label.start_with?("Other")
+    c = rg.members.first
+    case c.name
+    when INFORMAL_CANDIDATE then "cast an informal electorate vote"
+    when PARTY_VOTE_ONLY then "cast only a party vote"
+    when NO_ELECTORATE_VOTE then "were in Port Waikato, which had no electorate vote"
+    else "chose #{split_target(c)}"
     end
   end
 

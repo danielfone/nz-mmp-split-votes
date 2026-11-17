@@ -58,13 +58,20 @@
   .sankey .name { font-weight: 600; }
   .sankey .upper { font-weight: 400; letter-spacing: .05em; }
   .sankey .node[tabindex] { cursor: pointer; outline: none; }
-  .sankey .node:is(:hover, :focus) .bar { stroke: var(--ink); stroke-width: 2; }
+  .sankey .node:focus .bar { stroke: var(--ink); stroke-width: 2; }
   .sankey .node:focus-visible text { text-decoration: underline; }
   .note { margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); }
   figcaption { margin: 8px 0 0; color: var(--muted); font-size: .9375rem; }
-<%- nodes.select(&:aria).each do |n| -%>
-  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f:not(.<%= n.id %>) { opacity: .05; }
-  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f.<%= n.id %> { opacity: .8; }
+  /* Selecting (focusing) a node fades every ribbon, then lifts that node's ribbons and shows its description in place of the caption. */
+  .desc { display: none; margin: 8px 0 0; font-size: .9375rem; }
+  .desc p { margin: 0 0 4px; font-weight: 600; }
+  .desc ul { margin: 0; padding-left: 1.5em; columns: 2 18em; column-gap: 24px; }
+  .desc .rest { color: var(--muted); }
+  .chart:has(.node:focus) .f { opacity: .05; }
+  .chart:has(.node:focus) figcaption { display: none; }
+<%- nodes.select(&:desc).each do |n| -%>
+  .chart:has(#w-<%= n.id %>:focus, #n-<%= n.id %>:focus) .f.<%= n.id %> { opacity: .8; }
+  .chart:has(#w-<%= n.id %>:focus, #n-<%= n.id %>:focus) #d-<%= n.id %> { display: block; }
 <%- end -%>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
   /* The split-vote table can be wider than the text column. */
@@ -152,6 +159,19 @@
 <figure class="chart">
 <%= chart %>
 <%- if flows? -%>
+<%- descriptions.each do |id, heading, rows, rest| -%>
+  <div class="desc" id="d-<%= id %>">
+    <p><%= h heading %></p>
+    <ul>
+    <%- rows.each do |share, text| -%>
+      <li><strong><%= share %>%</strong> <%= h text %></li>
+    <%- end -%>
+    <%- if rest -%>
+      <li class="rest">Others under 1% each</li>
+    <%- end -%>
+    </ul>
+  </div>
+<%- end -%>
   <figcaption>Party votes are on the left, electorate votes on the right. Each ribbon is the voters who chose that party and that candidate, drawn to scale. Coloured ribbons are split votes; faint ribbons stayed with the same party or cast no valid electorate vote. Parties under 2% and informal votes are grouped as “Other”<%= national? ? ', as are candidates under 2% and independents' : '' %>. Select a party or candidate to highlight its votes.</figcaption>
 <%- elsif candidates.any? -%>
   <p class="note">Bars show each column's own total: <%= num party_total %> party votes and <%= num candidate_total %> candidate votes. The totals differ because party and candidate votes are counted, and ruled informal, separately.</p>

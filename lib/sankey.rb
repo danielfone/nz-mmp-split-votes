@@ -12,7 +12,7 @@ require "cgi"
 # `prefix` keeps their element ids distinct. Ribbons carry unprefixed node
 # classes so one set of CSS rules highlights them in every rendering.
 module Sankey
-  Node = Struct.new(:id, :label, :short, :value, :paint, :aria, :y, :h, :label_y, :upper)
+  Node = Struct.new(:id, :label, :short, :value, :paint, :aria, :y, :h, :label_y, :upper, :desc)
   Flow = Struct.new(:from, :to, :value, :from_paint, :to_paint, :faint)
 
   BAR = 12        # bar width
@@ -93,6 +93,7 @@ module Sankey
     tx = side == :left ? x + BAR + 6 : x - 6
     anchor = side == :left ? "start" : "end"
     focus = n.aria ? %( tabindex="0" role="img" aria-label="#{h n.aria}") : %( aria-hidden="true")
+    focus += %( aria-describedby="#{n.desc}") if n.desc
     label = short && n.short ? n.short : n.label
     <<~NODE.chomp
       <g class="node #{side}" id="#{prefix}-#{n.id}"#{focus}>
