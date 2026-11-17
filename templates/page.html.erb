@@ -144,17 +144,6 @@
 <%- end -%>
 </figure>
 
-<%- if national? -%>
-<h2><%= year %> electorates</h2>
-<%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
-<h3><%= heading %></h3>
-<ul class="electorates">
-<%- lists[type].to_a.each do |r| -%>
-  <li><a href="<%= page_path(year, r.slug) %>"><%= h r.name %></a></li>
-<%- end -%>
-</ul>
-<%- end -%>
-<%- end -%>
 
 <%- if flows? -%>
 <h2>All figures</h2>
@@ -213,6 +202,17 @@
   </tbody>
 </table>
 </div>
+<%- end -%>
+<%- end -%>
+<%- if national? -%>
+<h2><%= year %> electorates</h2>
+<%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
+<h3><%= heading %></h3>
+<ul class="electorates">
+<%- lists[type].to_a.each do |r| -%>
+  <li><a href="<%= page_path(year, r.slug) %>"><%= h r.name %></a></li>
+<%- end -%>
+</ul>
 <%- end -%>
 <%- end -%>
 </main>
