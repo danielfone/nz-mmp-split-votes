@@ -48,7 +48,7 @@
   /* Same-party / split / other bar, in the table's colours so it doubles as the table's key. */
   .shares { margin: 0 0 8px; }
   .shares .bar { display: flex; gap: 2px; height: 12px; border-radius: 3px; overflow: hidden; }
-  .shares p { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0; font-size: .9375rem; }
+  .shares p { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0; color: var(--muted); font-size: .8125rem; }
   .shares p > span { white-space: nowrap; }
   .shares .key { display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .3em; }
   .shares .same { background: var(--same); }
@@ -150,7 +150,8 @@
 <%- same, split, other = vote_shares; whole = [same.round, split.round]; whole << 100 - whole.sum -%>
 <div class="shares" id="summary">
   <div class="bar" aria-hidden="true"><span class="same" style="width:<%= same.round(1) %>%"></span><span class="split" style="width:<%= split.round(1) %>%"></span><span class="other" style="width:<%= other.round(1) %>%"></span></div>
-  <p><span><span class="key same"></span><strong><%= whole[0] %>%</strong> voted for their party's candidate</span> <span><span class="key split"></span><strong><%= whole[1] %>%</strong> split their vote</span> <span><span class="key other"></span><strong><%= whole[2] %>%</strong> informal or no electorate vote</span></p>
+  <p aria-hidden="true"><span><span class="key same"></span>Same party</span> <span><span class="key split"></span>Split</span> <span><span class="key other"></span>Informal/none</span></p>
+  <p class="vh"><%= whole[0] %>% voted for their party's candidate, <%= whole[1] %>% split their vote, <%= whole[2] %>% informal or no electorate vote.</p>
 </div>
 <%- elsif candidates.any? -%>
 <p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
