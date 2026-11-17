@@ -61,7 +61,6 @@
   th, td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
   th[scope=row], thead th:first-child, td.text { text-align: left; }
   thead th { vertical-align: bottom; font-weight: 600; }
-  td small { display: block; color: var(--muted); }
   footer { margin-top: 40px; padding-bottom: 32px; color: var(--muted); font-size: .875rem; border-top: 1px solid var(--line); }
   footer a { color: inherit; }
   @media (forced-colors: active) { .sankey { forced-color-adjust: none; } }
@@ -154,7 +153,7 @@
       <th scope="row"><%= h p.label %></th>
       <td><%= num p.votes %></td>
     <%- candidates.each do |c| cell = p.cells[c.name] -%>
-      <td><%= cell.pct %>%<small><%= cell.exact ? '' : '≈' %><%= num cell.count %></small></td>
+      <td><%= cell.pct %>%</td>
     <%- end -%>
     </tr>
   <%- end -%>
@@ -192,7 +191,7 @@
 <footer>
   <p>Source: Electoral Commission, <a href="<%= source %>"><%= source.sub(%r{\Ahttps?://}, '') %></a>.
   <%- if flows? -%>
-  The Commission publishes split votes as percentages to two decimal places. Counts here are derived from those percentages and each party's total; counts marked ≈ may differ from the true figure by a few votes.
+  The Commission publishes split votes as percentages to two decimal places. The table shows those published figures. Vote counts in the chart and summary are derived from them and each party's total, so they may differ from the true counts by a few votes.
   <%- elsif status == 'preliminary' -%>
   These are preliminary figures and will change when the official count is published.
   <%- end -%>
