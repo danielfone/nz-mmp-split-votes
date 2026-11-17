@@ -21,10 +21,11 @@
   main, header, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
   header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding-top: 16px; }
   header .site { font-weight: 700; text-decoration: none; color: var(--ink); }
-  .switcher { display: flex; gap: 8px; }
-  .switch { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 2px 10px; cursor: pointer; }
-  .switch:hover { border-color: var(--muted); }
+  .switch { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 0 4px; margin: 0 -4px; cursor: pointer; text-decoration: underline dotted var(--muted); text-decoration-thickness: 2px; text-underline-offset: 6px; }
+  .switch:hover { background: var(--panel); }
   .switch:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
+  .switch + .switch { margin-left: 4px; }
+  .chev { font-size: .55em; color: var(--muted); margin-left: .25em; vertical-align: .25em; }
   .menu { margin: auto; width: min(44rem, calc(100vw - 32px)); max-height: 80vh; overflow: auto; padding: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
   .menu::backdrop { background: rgb(0 0 0 / .35); }
   .menu h2 { margin: 0 0 8px; }
@@ -84,10 +85,6 @@
 <%- lists = electorate_lists(year) -%>
 <header>
   <a class="site" href="/">MMP Split Vote Explorer</a>
-  <nav class="switcher" aria-label="Election and electorate">
-    <button class="switch" popovertarget="year-menu"><span class="vh">Election year: </span><%= year %> <span aria-hidden="true">▾</span></button>
-    <button class="switch" popovertarget="place-menu"><span class="vh">Electorate: </span><%= h name %> <span aria-hidden="true">▾</span></button>
-  </nav>
   <div id="year-menu" class="menu" popover>
     <h2>Election year</h2>
     <ul class="years">
@@ -115,7 +112,9 @@
   </div>
 </header>
 <main>
-<h1><%= h title %></h1>
+<%# The title is the switcher. Chevrons are hidden so the heading reads "Selwyn 2023"; each button's purpose is its description. %>
+<h1 class="switcher"><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button> <button class="switch" popovertarget="year-menu" aria-describedby="year-hint"><%= year %><span class="chev" aria-hidden="true">▾</span></button></h1>
+<span id="place-hint" hidden>Change electorate</span><span id="year-hint" hidden>Change election year</span>
 <%- if flows? -%>
 <p class="status"><%= status.capitalize %> results · split votes published</p>
 <p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
