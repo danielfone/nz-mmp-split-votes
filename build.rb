@@ -239,11 +239,6 @@ class Result
     "#{group.label}: #{approx ? 'about ' : ''}#{num group.votes} votes. #{parts.join(', ')}."
   end
 
-  # Every candidate column on its own, for the per-party list.
-  def candidate_columns
-    @candidates.map { |c| Group.new(c.label, c.party, [c]) }
-  end
-
   def chart
     right = right_groups.each_with_index.map do |g, j|
       Sankey::Node.new("c#{j}", g.label, pct(g.votes, candidate_total), g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
