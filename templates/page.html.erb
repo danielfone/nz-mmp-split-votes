@@ -42,7 +42,6 @@
   .lede { font-size: 1.1rem; margin: 0 0 8px; }
   .splits { margin: 0 0 16px; padding-left: 1.5em; }
   .splits li { margin: 0 0 2px; }
-  .splits .share { color: var(--muted); }
   figure { margin: 0; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
   .sankey-n { display: none; }
@@ -125,12 +124,14 @@
 <h1><%= h title %></h1>
 <%- if flows? -%>
 <p class="status"><%= status.capitalize %> results · split votes published</p>
-<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party. The biggest splits:</p>
-<ol class="splits">
-<%- top_splits.each do |votes, party, cand| -%>
-  <li><strong><%= num votes %></strong> <%= h party.label %> party voters <span class="share">(<%= party.cells[cand.name].pct %>%)</span> chose <%= h cand.official %></li>
+<p class="lede">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
+<%- if top_splits.any? -%>
+<ul class="splits">
+<%- top_splits.each do |share, party, cand| -%>
+  <li><strong><%= share.round %>%</strong> of <%= h party.label %> party voters chose <%= h split_target(cand) %></li>
 <%- end -%>
-</ol>
+</ul>
+<%- end -%>
 <%- elsif candidates.any? -%>
 <p class="status"><%= status.capitalize %> count · split votes not yet published</p>
 <p class="lede">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>

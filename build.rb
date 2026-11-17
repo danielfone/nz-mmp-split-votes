@@ -9,6 +9,7 @@ require_relative "lib/sankey"
 
 OUT = "site"
 MAIN_SHARE = 0.02    # groups below this share are drawn as one "Other" node (the tables keep them all)
+SPLIT_SHARE = 20     # a split is highlighted if at least this % of a main party's voters made it
 EXACT_BELOW = 10_000 # a percentage to 2 d.p. pins down a count exactly only when the row total is under this
 
 def read(path)
@@ -309,9 +310,27 @@ class Result
     end
   end
 
-  # The largest groups of voters who backed one party but a different party's candidate.
-  def top_splits(n = 5)
-    split_flows.select { |count, _, _| count > 0 }.sort_by { |count, _, _| -count }.first(n)
+  # The strongest splits: where at least SPLIT_SHARE of a main party's voters backed
+  # another party's candidate, ranked by that share. Returns [share, party, candidate].
+  def top_splits(n = 3)
+    main = @parties.reject(&:informal?).select { |p| p.votes >= MAIN_SHARE * party_total }
+    main.flat_map do |p|
+      @candidates.reject { |c| c.special? || c.party == p.name || p.cells[c.name].nil? }
+                 .map { |c| [p.cells[c.name].pct.to_f, p, c] }
+    end.select { |share, _, _| share >= SPLIT_SHARE }.sort_by { |share, _, _| -share }.first(n)
+  end
+
+  # How a split sentence names the candidate: "the Labour candidate", "National candidates".
+  def split_target(cand)
+    independent = cand.party.to_s.empty? || cand.party == "Independent"
+    if national?
+      cand.name == INDEPENDENTS ? "independent and other candidates" : "#{short(cand.party)} candidates"
+    elsif independent
+      others = @candidates.count { |c| c.person? && (c.party.to_s.empty? || c.party == "Independent") }
+      others > 1 ? "the independent candidate #{cand.name.split(', ').first}" : "the independent candidate"
+    else
+      "the #{short(cand.party)} candidate"
+    end
   end
 
   def split_share
