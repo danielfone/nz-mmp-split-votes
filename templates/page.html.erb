@@ -27,19 +27,21 @@
   .switch { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 0 4px; margin: 0 -4px; cursor: pointer; text-decoration: underline dotted var(--muted); text-decoration-thickness: 2px; text-underline-offset: 6px; }
   .switch:hover { background: var(--panel); }
   .switch:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
-  .switch + .switch { margin-left: 4px; }
   .chev { font-size: .55em; color: var(--muted); margin-left: .25em; vertical-align: .25em; }
   .menu { margin: auto; width: min(44rem, calc(100vw - 32px)); max-height: 80vh; overflow: auto; padding: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
   .menu::backdrop { background: rgb(0 0 0 / .35); }
   .menu h2 { margin: 0 0 8px; }
   .menu a[aria-current] { font-weight: 700; color: var(--ink); text-decoration: none; }
-  .years { list-style: none; padding: 0; margin: 0; font-size: 1.1rem; }
-  .years li { padding: 4px 0; }
-  .years .off { color: var(--muted); }
+  .year-nav { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 20px 0 0; font-size: 1.25rem; font-weight: 600; }
+  .year-nav a, .year-nav .off { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 22px; font-size: 1.6rem; line-height: 1; text-decoration: none; }
+  .year-nav a:hover { background: var(--panel); }
+  .year-nav .off { color: var(--line); cursor: default; }
+  .place { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 16px; margin: 4px 0 16px; }
+  .place .nationwide { font-size: 1.05rem; }
   .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .electorates { columns: 3 11em; gap: 16px; padding: 0; margin: 4px 0 12px; list-style: none; font-size: .9375rem; }
   .electorates li { break-inside: avoid; }
-  h1 { font-size: 1.9rem; line-height: 1.2; margin: 16px 0 4px; }
+  h1 { font-size: 1.6rem; line-height: 1.2; margin: 0; }
   h2 { font-size: 1.2rem; margin: 32px 0 8px; }
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 16px; }
@@ -93,19 +95,6 @@
 <%- lists = electorate_lists(year) -%>
 <header>
   <a class="site" href="/"><span class="kicker">New Zealand MMP</span> <span class="name">Split-Vote Explorer</span></a>
-  <div id="year-menu" class="menu" popover>
-    <h2>Election year</h2>
-    <ul class="years">
-    <%- year_links(self).each do |y, st, href| -%>
-      <%- label = "#{y}#{' (preliminary)' if st == 'preliminary'}" -%>
-      <%- if href -%>
-      <li><a href="<%= href %>"<%= ' aria-current="page"' if y == year %>><%= label %></a></li>
-      <%- else -%>
-      <li class="off"><%= label %> <small>no <%= h name %> electorate</small></li>
-      <%- end -%>
-    <%- end -%>
-    </ul>
-  </div>
   <div id="place-menu" class="menu" popover>
     <h2><%= year %> electorates</h2>
     <p><a href="<%= page_path(year, 'national') %>"<%= ' aria-current="page"' if national? %>>Nationwide</a></p>
@@ -120,9 +109,29 @@
   </div>
 </header>
 <main>
-<%# The title is the switcher. Chevrons are hidden so the heading reads "Selwyn 2023"; each button's purpose is its description. %>
-<h1 class="switcher"><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button> <button class="switch" popovertarget="year-menu" aria-describedby="year-hint"><%= year %><span class="chev" aria-hidden="true">▾</span></button></h1>
-<span id="place-hint" hidden>Change electorate</span><span id="year-hint" hidden>Change election year</span>
+<%# Previous/next election for the same place, greyed where the place didn't exist that year. %>
+<nav class="year-nav" aria-label="Election year">
+<%- prev_year, next_year = neighbours(self) -%>
+<%- [[prev_year, "‹", "prev"], [:current], [next_year, "›", "next"]].each do |y, arrow, rel| -%>
+<%- if y == :current -%>
+  <span aria-current="page"><%= year %></span>
+<%- elsif y.nil? -%>
+  <span class="off" aria-hidden="true"></span>
+<%- elsif y[1] -%>
+  <a href="<%= y[1] %>" rel="<%= rel %>" aria-label="<%= y[0] %> election"><%= arrow %></a>
+<%- else -%>
+  <span class="off" title="No <%= h name %> electorate in <%= y[0] %>"><span aria-hidden="true"><%= arrow %></span><span class="vh">No <%= h name %> electorate in <%= y[0] %></span></span>
+<%- end -%>
+<%- end -%>
+</nav>
+<%# The electorate name opens the electorate menu. The chevron is hidden so the heading reads "Selwyn 2023". %>
+<div class="place">
+<h1><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button><span class="vh"> <%= year %></span></h1>
+<%- unless national? -%>
+<a class="nationwide" href="<%= page_path(year, 'national') %>">Nationwide</a>
+<%- end -%>
+</div>
+<span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
 <p class="status"><%= status.capitalize %> results · split votes published</p>
 <p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>

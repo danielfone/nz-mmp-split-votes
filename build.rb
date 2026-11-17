@@ -333,12 +333,14 @@ ELECTIONS.each do |e|
   RESULTS[e["year"]] = results
 end
 
-# Each election year, with a link to the same place in that year (nil where it didn't exist).
-def year_links(result)
-  ELECTIONS.map do |e|
-    y = e["year"]
-    href = RESULTS[y].any? { |r| r.slug == result.slug } ? page_path(y, result.slug) : nil
-    [y, e["status"], href]
+# The previous and next elections as [year, href], or nil at either end. The href is
+# nil where this place didn't exist that year.
+def neighbours(result)
+  i = ELECTIONS.index { |e| e["year"] == result.year }
+  [i - 1, i + 1].map do |j|
+    next nil unless j.between?(0, ELECTIONS.size - 1)
+    y = ELECTIONS[j]["year"]
+    [y, RESULTS[y].any? { |r| r.slug == result.slug } ? page_path(y, result.slug) : nil]
   end
 end
 
