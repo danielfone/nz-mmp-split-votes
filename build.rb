@@ -45,11 +45,12 @@ def palette_css
   [light.join(" "), dark.join(" ")]
 end
 
-# "GRIGG, Nicola Anna" -> "Nicola Grigg"
+# "GRIGG, Nicola Anna" -> "Nicola Grigg"; "HOWARD, Thomas Edward (Ted)" -> "Ted Howard"
 def display_name(official)
   surname, given = official.split(", ", 2)
   return official unless given
-  "#{given.split.first} #{surname.split(/([ -])/).map(&:capitalize).join}"
+  first = given[/\(([^)]+)\)/, 1] || given.split.first
+  "#{first} #{surname.split(/([ -])/).map(&:capitalize).join}"
 end
 
 def page_path(year, slug)

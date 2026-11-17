@@ -6,7 +6,7 @@ generated at build time, and highlighting uses CSS.
 
 ## Build
 
-    ruby import_2023.rb    # data/raw/2023/*.csv -> data/2023/*.csv
+    for y in 2017 2020 2023; do ruby import_split_votes.rb $y; done   # data/raw/<y>/*.csv -> data/<y>/*.csv
     ruby import_2026.rb    # data/raw/2026-preliminary/*.html -> data/2026/*.csv
     ruby build.rb          # data/ -> site/
     python3 -m http.server 8123 --directory site
