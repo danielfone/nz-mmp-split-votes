@@ -229,13 +229,13 @@
 <%- end -%>
 </main>
 <footer>
-  <p>Source: Electoral Commission, <a href="<%= source %>"><%= source.sub(%r{\Ahttps?://}, '') %></a>.
+  <p>Data © Electoral Commission New Zealand, from <a href="<%= source %>">electionresults.govt.nz</a>.</p>
   <%- if flows? -%>
-  The Commission publishes split votes as percentages to two decimal places. The table shows those published figures. Vote counts in the chart and summary are derived from them and each party's total, so they may differ from the true counts by a few votes.
+  <p>Split votes are published as percentages of each party's voters, to two decimal places, and the table shows them as published. Other figures, such as ribbon widths and the headline share, are calculated from those percentages and each party's total, so may be off by a few votes.</p>
   <%- elsif status == 'preliminary' -%>
-  These are preliminary figures and will change when the official count is published.
+  <p>Preliminary count: figures will change when the official result is declared.</p>
   <%- end -%>
-  Data © Electoral Commission New Zealand. Site code MIT licensed.</p>
+  <p>Code MIT licensed.</p>
 </footer>
 </body>
 </html>
