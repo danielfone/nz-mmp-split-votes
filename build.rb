@@ -338,16 +338,18 @@ ELECTIONS.each do |e|
   RESULTS[e["year"]] = results
 end
 
+# Each election year, with a link to the same place in that year (nil where it didn't exist).
 def year_links(result)
   ELECTIONS.map do |e|
     y = e["year"]
-    slug = RESULTS[y].any? { |r| r.slug == result.slug } ? result.slug : "national"
-    [y, e["status"], page_path(y, slug)]
+    href = RESULTS[y].any? { |r| r.slug == result.slug } ? page_path(y, result.slug) : nil
+    [y, e["status"], href]
   end
 end
 
+# Sorted by slug so macrons sort with their base letter (Ōtaki among the Os).
 def electorate_lists(year)
-  RESULTS[year].reject(&:national?).sort_by(&:name).group_by(&:type)
+  RESULTS[year].reject(&:national?).sort_by(&:slug).group_by(&:type)
 end
 
 # ---- render ----
