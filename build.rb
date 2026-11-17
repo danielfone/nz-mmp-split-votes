@@ -4,6 +4,7 @@
 require "csv"
 require "erb"
 require "fileutils"
+require "set"
 require_relative "lib/common"
 require_relative "lib/sankey"
 
@@ -279,6 +280,18 @@ class Result
       @candidates.reject { |c| c.special? || c.party == p.name || p.cells[c.name].nil? }
                  .map { |c| [p.cells[c.name].pct.to_f, p, c] }
     end.select { |share, _, _| share >= SPLIT_SHARE }.sort_by { |share, _, _| -share }.first(n)
+  end
+
+  # How a table cell is shaded: :same for a party's own candidate (the diagonal), a share
+  # for a split to another party's candidate, or nil (categories, zero, and parties that
+  # had no candidate here, whose voters all had to split).
+  def heat(party, cand)
+    return nil if cand.special?
+    return :same if cand.party == party.name
+    @with_candidate ||= @candidates.reject(&:special?).map(&:party).to_set
+    return nil unless @with_candidate.include?(party.name)
+    share = party.cells[cand.name].pct.to_f
+    share.zero? ? nil : share
   end
 
   # How a split sentence names the candidate: "the Labour candidate", "National candidates".
