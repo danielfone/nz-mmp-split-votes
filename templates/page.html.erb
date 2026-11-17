@@ -44,17 +44,18 @@
   h2 { font-size: 1.2rem; margin: 32px 0 8px; }
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 8px; }
-  #summary { margin: 1rem 0; padding: 0.5rem; border: 1px solid var(--line); border-radius: 4px; min-height: 80px; }
-  .lede { color: var(--muted); margin: 0 0 8px; font-style: italic; }
+  /* One summary box above the chart: the split bar, or a note where there is none. The minimum height keeps the chart from jumping between pages. */
+  .summary { margin: 12px 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); min-height: 80px; }
+  .summary p { margin: 0; }
+  .summary .label { margin-bottom: 4px; color: var(--muted); font-size: .8125rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
   /* Same-party / split / other bar, in the table's colours so it doubles as the table's key. */
-  .shares { margin: 0 0 8px; }
   .shares .bar { display: flex; gap: 2px; height: 12px; border-radius: 3px; overflow: hidden; }
-  .shares p { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0; color: var(--muted); font-size: .8125rem; }
-  .shares p > span { white-space: nowrap; }
+  .shares .keys { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0; color: var(--muted); font-size: .8125rem; }
+  .shares .keys > span { white-space: nowrap; }
   .shares .key { display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .3em; }
   .shares .same { background: var(--same); }
   .shares .split { background: var(--split); }
-  .shares .other { background: color-mix(in srgb, var(--muted) 40%, var(--bg)); }
+  .shares .other { background: color-mix(in srgb, var(--muted) 40%, var(--panel)); }
   figure { margin: 0; }
   .hint { margin: 8px 0 4px; color: var(--muted); font-size: .9375rem; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
@@ -69,7 +70,6 @@
   .sankey .node[tabindex] { cursor: pointer; outline: none; }
   .sankey .node:focus .bar { stroke: var(--ink); stroke-width: 2; }
   .sankey .node:focus-visible text { text-decoration: underline; }
-  .note { margin: 8px 0 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); }
   figcaption { margin: 8px 0 0; color: var(--muted); font-size: .8125rem; }
   /* Selecting (focusing) a node fades every ribbon, then lifts that node's ribbons and shows its description in place of the caption. */
   .desc { display: none; margin: 8px 0 0; font-size: .9375rem; }
@@ -149,14 +149,22 @@
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
 <%- same, split, other = vote_shares; whole = [same.round, split.round]; whole << 100 - whole.sum -%>
-<div class="shares" id="summary">
-  <p>Party/Electorate Vote:</p>
+<div class="summary shares" id="summary">
+  <p class="label">Party / Electorate Vote</p>
   <div class="bar" aria-hidden="true"><span class="same" style="width:<%= same.round(1) %>%"></span><span class="split" style="width:<%= split.round(1) %>%"></span><span class="other" style="width:<%= other.round(1) %>%"></span></div>
-  <p aria-hidden="true"><span><span class="key same"></span>Same party</span> <span><span class="key split"></span>Split</span> <span><span class="key other"></span>Informal/none</span></p>
+  <p class="keys" aria-hidden="true"><span><span class="key same"></span>Same party</span> <span><span class="key split"></span>Split</span> <span><span class="key other"></span>Informal/none</span></p>
   <p class="vh"><%= whole[0] %>% voted for their party's candidate, <%= whole[1] %>% split their vote, <%= whole[2] %>% informal or no electorate vote.</p>
 </div>
+<%- elsif note && !national? -%>
+<div class="summary" id="summary">
+  <p class="label">Electorate Vote</p>
+  <p><%= h note %></p>
+</div>
 <%- elsif candidates.any? -%>
-<p class="lede" id="summary">Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
+<div class="summary" id="summary">
+  <p class="label">Split Votes</p>
+  <p>Not yet published. They'll appear here once the Electoral Commission releases them.</p>
+</div>
 <%- end -%>
 <%- status_line = flows? ? "#{status.capitalize} results · split votes published" : candidates.any? ? "#{status.capitalize} count · split votes not yet published" : "#{status.capitalize} results · party votes only" -%>
 
@@ -185,9 +193,6 @@
 <%- end -%>
 <%- end -%>
   <figcaption><%= national? ? 'Parties and candidates under 2%, independents, and informal votes' : 'Parties under 2% and informal party votes' %> are grouped as “Other”.<%= " #{h note}" if national? && note %></figcaption>
-<%- if note && !national? -%>
-  <p class="note"><%= h note %></p>
-<%- end -%>
 </figure>
 
 
@@ -234,7 +239,7 @@
 </div>
 <%- else -%>
 <h2>All Figures</h2>
-<p class="status"<%= ' id="summary"' unless candidates.any? %>><%= status_line %></p>
+<p class="status"><%= status_line %></p>
 <div class="table-wrap" tabindex="0" role="region" aria-labelledby="party-caption">
 <table>
   <caption id="party-caption">Party votes, <%= h title %> (<%= status %>)</caption>
