@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><%= h title %> · MMP Split Vote Explorer</title>
+<title><%= h title %> · New Zealand MMP Split-Vote Explorer</title>
 <link rel="canonical" href="<%= page_path(year, slug) %>">
 <style>
   :root {
@@ -19,8 +19,11 @@
   body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
   a { color: var(--link); }
   main, header, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
-  header { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; padding-top: 16px; }
-  header .site { font-weight: 700; text-decoration: none; color: var(--ink); }
+  header { padding-top: 24px; text-align: center; }
+  .site { display: inline-block; color: var(--ink); text-decoration: none; line-height: 1.1; }
+  .site span { display: block; }
+  .site .kicker { font-size: .8125rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .site .name { font-size: 2.25rem; font-weight: 700; letter-spacing: -.01em; }
   .switch { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 0 4px; margin: 0 -4px; cursor: pointer; text-decoration: underline dotted var(--muted); text-decoration-thickness: 2px; text-underline-offset: 6px; }
   .switch:hover { background: var(--panel); }
   .switch:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
@@ -89,7 +92,7 @@
 <body>
 <%- lists = electorate_lists(year) -%>
 <header>
-  <a class="site" href="/">MMP Split Vote Explorer</a>
+  <a class="site" href="/"><span class="kicker">New Zealand MMP</span> <span class="name">Split-Vote Explorer</span></a>
   <div id="year-menu" class="menu" popover>
     <h2>Election year</h2>
     <ul class="years">
