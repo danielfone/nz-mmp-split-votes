@@ -152,7 +152,7 @@
 <figure class="chart">
 <%= chart %>
 <%- if flows? -%>
-  <figcaption>Ribbons between different parties are split votes; faint ribbons stayed with the same party. Hover over, tap or tab to a party or candidate to highlight its votes.</figcaption>
+  <figcaption>Party votes are on the left, electorate votes on the right. Each ribbon is the voters who chose that party and that candidate, drawn to scale. Coloured ribbons are split votes; faint ribbons stayed with the same party or cast no valid electorate vote. Parties under 2% and informal votes are grouped as “Other”<%= national? ? ', as are candidates under 2% and independents' : '' %>. Select a party or candidate to highlight its votes.</figcaption>
 <%- elsif candidates.any? -%>
   <p class="note">Bars show each column's own total: <%= num party_total %> party votes and <%= num candidate_total %> candidate votes. The totals differ because party and candidate votes are counted, and ruled informal, separately.</p>
 <%- end -%>
