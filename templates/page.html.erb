@@ -47,6 +47,15 @@
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 8px; }
   .lede { font-size: 1.1rem; margin: 0 0 8px; }
+  /* Same-party / split / other bar, in the table's colours so it doubles as the table's key. */
+  .shares { margin: 0 0 8px; }
+  .shares .bar { display: flex; gap: 2px; height: 12px; border-radius: 3px; overflow: hidden; }
+  .shares p { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 4px 0 0; font-size: .9375rem; }
+  .shares p > span { white-space: nowrap; }
+  .shares .key { display: inline-block; width: .7em; height: .7em; border-radius: 2px; margin-right: .3em; }
+  .shares .same { background: var(--same); }
+  .shares .split { background: var(--split); }
+  .shares .other { background: color-mix(in srgb, var(--muted) 40%, var(--bg)); }
   figure { margin: 0; }
   .hint { margin: 8px 0 4px; color: var(--muted); font-size: .9375rem; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
@@ -145,7 +154,11 @@
 </div>
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
-<p class="lede" id="summary">About <%= split_share %> of <%= h where %> gave their electorate vote to a candidate from a different party.</p>
+<%- same, split, other = vote_shares; whole = [same.round, split.round]; whole << 100 - whole.sum -%>
+<div class="shares" id="summary">
+  <div class="bar" aria-hidden="true"><span class="same" style="width:<%= same.round(1) %>%"></span><span class="split" style="width:<%= split.round(1) %>%"></span><span class="other" style="width:<%= other.round(1) %>%"></span></div>
+  <p><span><span class="key same"></span><strong><%= whole[0] %>%</strong> voted for their party's candidate</span> <span><span class="key split"></span><strong><%= whole[1] %>%</strong> split their vote</span> <span><span class="key other"></span><strong><%= whole[2] %>%</strong> informal or no electorate vote</span></p>
+</div>
 <%- elsif candidates.any? -%>
 <p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
 <%- end -%>

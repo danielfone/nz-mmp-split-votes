@@ -186,10 +186,6 @@ class Result
     "#{name} #{year}"
   end
 
-  def where
-    national? ? "voters nationwide" : "#{name} voters"
-  end
-
   def party_total
     @parties.sum(&:votes)
   end
@@ -362,8 +358,16 @@ class Result
     end
   end
 
-  def split_share
-    pct(split_flows.sum(&:first), party_total, 0)
+  # Party voters split three ways, as percentages of all party votes: those who chose their
+  # own party's candidate, those who chose another (split), and the rest (informal votes,
+  # party vote only, or no electorate vote).
+  def vote_shares
+    same = @parties.reject(&:informal?).sum do |p|
+      @candidates.select { |c| !c.special? && c.party == p.name }.sum { |c| p.cells[c.name] ? p.cells[c.name].count : 0 }
+    end
+    split = split_flows.sum(&:first)
+    shares = [same, split].map { |v| 100.0 * v / party_total }
+    shares << 100 - shares.sum
   end
 
   def get_binding
