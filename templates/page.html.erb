@@ -88,7 +88,7 @@
   @media (min-width: 700px) { th[scope=row] { min-width: 13em; } }
   .table-wrap:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   table { border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; width: 100%; }
-  caption { text-align: left; padding: 8px; font-weight: 600; }
+  caption { text-align: left; padding: 8px; }
   th, td { padding: 6px 12px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
   th[scope=row], thead th:first-child, td.text { text-align: left; }
   thead th { vertical-align: bottom; font-weight: 600; }
@@ -104,9 +104,9 @@
 <header>
   <a class="site" href="/"><span class="kicker">New Zealand MMP</span> <span class="name">Split-Vote Explorer</span></a>
   <div id="place-menu" class="menu" popover>
-    <h2><%= year %> electorates</h2>
+    <h2><%= year %> Electorates</h2>
     <p><a href="<%= page_path(year, 'national') %>"<%= ' aria-current="page"' if national? %>>Nationwide</a></p>
-    <%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
+    <%- [["general", "General Electorates"], ["maori", "Māori Electorates"]].each do |type, heading| -%>
     <h3><%= heading %></h3>
     <ul class="electorates">
     <%- lists[type].to_a.each do |r| -%>
@@ -152,7 +152,7 @@
 <%- end -%>
 <%- elsif candidates.any? -%>
 <p class="status"><%= status.capitalize %> count · split votes not yet published</p>
-<p class="lede" id="summary">Party votes and electorate candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. How each party's voters cast their candidate vote will be shown once the Electoral Commission publishes split-vote statistics.</p>
+<p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
 <%- else -%>
 <p class="status" id="summary"><%= status.capitalize %> results · party votes only</p>
 <%- end -%>
@@ -173,10 +173,8 @@
     </ul>
   </div>
 <%- end -%>
-  <figcaption>Party votes are on the left, electorate votes on the right. Each ribbon is the voters who chose that party and that candidate, drawn to scale. Coloured ribbons are split votes; faint ribbons stayed with the same party or cast no valid electorate vote. Parties under 2% and informal votes are grouped as “Other”<%= national? ? ', as are candidates under 2% and independents' : '' %>. Select a party or candidate to highlight its votes.</figcaption>
-<%- elsif candidates.any? -%>
-  <p class="note">Bars show each column's own total: <%= num party_total %> party votes and <%= num candidate_total %> candidate votes. The totals differ because party and candidate votes are counted, and ruled informal, separately.</p>
 <%- end -%>
+  <figcaption><%= national? ? 'Parties and candidates under 2%, independents and informal votes' : 'Parties under 2% and informal party votes' %> are grouped as “Other”.</figcaption>
 <%- if note -%>
   <p class="note"><%= h note %></p>
 <%- end -%>
@@ -184,11 +182,13 @@
 
 
 <%- if flows? -%>
-<h2>All figures</h2>
-<p class="table-note">Green cells are votes for the party's own candidate; red cells are split votes for another party's candidate. The stronger the colour, the larger the share of that party's voters.</p>
+<h2>All Figures</h2>
 <div class="table-wrap wide" tabindex="0" role="region" aria-labelledby="table-caption">
 <table>
-  <caption id="table-caption">Electorate vote by party vote, <%= h title %>. Percentages are of each party's voters.</caption>
+  <caption id="table-caption">
+    Electorate vote by party vote, <%= h title %>. Percentages are of each party's voters.<br>
+    <span class="table-note">Greenish cells are same-party votes, reddish cells are split votes.</span>
+  </caption>
   <thead>
     <tr>
       <th scope="col">Party vote</th>
@@ -222,7 +222,7 @@
 </table>
 </div>
 <%- else -%>
-<h2>All figures</h2>
+<h2>All Figures</h2>
 <div class="table-wrap" tabindex="0" role="region" aria-labelledby="party-caption">
 <table>
   <caption id="party-caption">Party votes, <%= h title %> (<%= status %>)</caption>
@@ -249,8 +249,8 @@
 <%- end -%>
 <%- end -%>
 <%- if national? -%>
-<h2><%= year %> electorates</h2>
-<%- [["general", "General electorates"], ["maori", "Māori electorates"]].each do |type, heading| -%>
+<h2><%= year %> Electorates</h2>
+<%- [["general", "General Electorates"], ["maori", "Māori Electorates"]].each do |type, heading| -%>
 <h3><%= heading %></h3>
 <ul class="electorates">
 <%- lists[type].to_a.each do |r| -%>
@@ -262,12 +262,8 @@
 </main>
 <footer>
   <p>Data © Electoral Commission New Zealand, from <a href="<%= source %>">electionresults.govt.nz</a>.</p>
-  <%- if flows? -%>
-  <p>Split votes are published as percentages of each party's voters, to two decimal places, and the table shows them as published. Other figures, such as ribbon widths and the headline share, are calculated from those percentages and each party's total, so may be off by a few votes.</p>
-  <%- elsif status == 'preliminary' -%>
-  <p>Preliminary count: figures will change when the official result is declared.</p>
-  <%- end -%>
-  <p>Code MIT licensed.</p>
+  <p>Crafted with care by <a href="https://daniel.fone.net.nz">Daniel Fone</a>.</p>
+  <p>For no particular reason, this page doesn't use JavaScript.</p>
 </footer>
 </body>
 </html>
