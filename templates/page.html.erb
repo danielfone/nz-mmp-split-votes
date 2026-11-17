@@ -13,7 +13,7 @@
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #22272c; --link: #7fb2ec; --same: #3fc4a0; --split: #f0884a; <%= dark %> }
+    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #444b52; --link: #7fb2ec; --same: #3fc4a0; --split: #f0884a; <%= dark %> }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -45,8 +45,8 @@
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 8px; }
   /* One summary box above the chart: the split bar, or a note where there is none. The minimum height keeps the chart from jumping between pages. */
-  .summary { margin: 12px 0; padding: 8px 12px; background: var(--panel); border-left: 4px solid var(--muted); min-height: 80px; }
-  .summary p { margin: 0; }
+  .summary { margin: 1.5rem 0; padding: 8px 12px; background: var(--panel); min-height: 85px; }
+  .summary p { margin: 0; font-size: .9375rem; }
   .summary .label { margin-bottom: 4px; color: var(--muted); font-size: .8125rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
   /* Same-party / split / other bar, in the table's colours so it doubles as the table's key. */
   .shares .bar { display: flex; gap: 2px; height: 12px; border-radius: 3px; overflow: hidden; }
