@@ -8,12 +8,12 @@
 <link rel="canonical" href="<%= page_path(year, slug) %>">
 <style>
   :root {
-    --ink: #1b1f24; --muted: #5c6670; --line: #d8dde2; --bg: #ffffff; --panel: #f2f4f6; --link: #1f5fa8; --heat: var(--ink);
+    --ink: #1b1f24; --muted: #5c6670; --line: #d8dde2; --bg: #ffffff; --panel: #f2f4f6; --link: #1f5fa8; --same: #009e73; --split: #d55e00;
     <%= light %>
     color-scheme: light dark;
   }
   @media (prefers-color-scheme: dark) {
-    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #22272c; --link: #7fb2ec; <%= dark %> }
+    :root { --ink: #e6e9ec; --muted: #9aa4ad; --line: #343a40; --bg: #15181b; --panel: #22272c; --link: #7fb2ec; --same: #3fc4a0; --split: #f0884a; <%= dark %> }
   }
   * { box-sizing: border-box; }
   body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
@@ -76,11 +76,12 @@
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
   /* The split-vote table can be wider than the text column. */
   .table-wrap.wide { width: min(1100px, calc(100vw - 40px)); margin-left: calc(50% - min(550px, 50vw - 20px)); }
-  /* Heat map: split cells are tinted by share (up to 50% strength, so text keeps its contrast). */
-  td.split { background: color-mix(in srgb, var(--heat) var(--h), var(--bg)); }
+  /* Heat map: green for a party's own candidate, red for another party's, each tinted by share (up to 50% strength, so text keeps its contrast). */
+  td.same, td.split { background: color-mix(in srgb, var(--heat) var(--h), var(--bg)); }
+  td.same { --heat: var(--same); }
+  td.split { --heat: var(--split); }
   td.strong { font-weight: 600; }
   .table-note { color: var(--muted); font-size: .9375rem; margin: 0 0 8px; }
-  td.same { color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); }
   thead .line { display: block; white-space: nowrap; font-weight: 400; }
   thead .surname { font-weight: 600; }
   thead .party { color: var(--muted); }
@@ -184,7 +185,7 @@
 
 <%- if flows? -%>
 <h2>All figures</h2>
-<p class="table-note">Shaded cells are split votes: the darker the cell, the larger the share of that party's voters who chose another party's candidate. Outlined cells are votes for the party's own candidate.</p>
+<p class="table-note">Green cells are votes for the party's own candidate; red cells are split votes for another party's candidate. The stronger the colour, the larger the share of that party's voters.</p>
 <div class="table-wrap wide" tabindex="0" role="region" aria-labelledby="table-caption">
 <table>
   <caption id="table-caption">Electorate vote by party vote, <%= h title %>. Percentages are of each party's voters.</caption>
@@ -208,10 +209,9 @@
       <th scope="row"><%= h p.label %></th>
       <td><%= num p.votes %></td>
     <%- table_candidates.each do |c| cell = p.cells[c.name]; heat = heat(p, c) -%>
-      <%- if heat == :same -%>
-      <td class="same"><%= cell.pct %>%</td>
-      <%- elsif heat -%>
-      <td class="split<%= ' strong' if heat >= SPLIT_SHARE %>" style="--h:<%= (heat / 2).round(1) %>%"><%= cell.pct %>%</td>
+      <%- if heat -%>
+      <%- kind, share = heat -%>
+      <td class="<%= kind %><%= ' strong' if kind == :split && share >= SPLIT_SHARE %>" style="--h:<%= (share / 2).round(1) %>%"><%= cell.pct %>%</td>
       <%- else -%>
       <td><%= cell.pct %>%</td>
       <%- end -%>
