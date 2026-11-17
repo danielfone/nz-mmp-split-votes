@@ -23,7 +23,7 @@ module Sankey
 
   module_function
 
-  def render(left:, right:, flows:, label:, width:, prefix:, short: false)
+  def render(left:, right:, flows:, label:, width:, prefix:, short: false, hint: nil)
     columns = [left, right].reject(&:empty?)
     # Both columns share one scale so a ribbon is the same thickness at each end.
     k = columns.map { |col| (HEIGHT - GAP * (col.size - 1)).to_f / col.sum(&:value) }.min
@@ -32,6 +32,7 @@ module Sankey
     heads = []
     heads << %(<text class="head" x="0" y="13">Party Vote</text>) if left.any?
     heads << %(<text class="head" x="#{width}" y="13" text-anchor="end">Electorate Vote</text>) if right.any?
+    heads << %(<text class="hint" x="#{width / 2}" y="13" text-anchor="middle">#{h hint}</text>) if hint
 
     <<~SVG
       <svg class="sankey sankey-#{prefix}" viewBox="0 0 #{width} #{height.ceil}" role="group" aria-label="#{h label}" aria-describedby="summary">

@@ -57,7 +57,6 @@
   .shares .split { background: var(--split); }
   .shares .other { background: color-mix(in srgb, var(--muted) 40%, var(--panel)); }
   figure { margin: 0; }
-  .hint { margin: 8px 0 4px; color: var(--muted); font-size: .9375rem; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
   .sankey-n { display: none; }
   @media (max-width: 560px) { .sankey-w { display: none; } .sankey-n { display: block; } }
@@ -66,6 +65,7 @@
   .sankey text { font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
   .sankey .name { font-weight: 600; }
   .sankey .head { font-size: 12px; font-weight: 600; fill: var(--muted); }
+  .sankey .hint { font-size: 11px; fill: var(--muted); }
   .sankey .upper { font-weight: 400; letter-spacing: .05em; }
   .sankey .node[tabindex] { cursor: pointer; outline: none; }
   .sankey .node:focus .bar { stroke: var(--ink); stroke-width: 2; }
@@ -169,13 +169,6 @@
 <%- status_line = flows? ? "#{status.capitalize} results · split votes published" : candidates.any? ? "#{status.capitalize} count · split votes not yet published" : "#{status.capitalize} results · party votes only" -%>
 
 <figure class="chart">
-  <p class="hint">
-  <%- if flows? -%>
-    Select a party or candidate for details.
-  <%- else -%>
-    No details available yet.
-  <%- end -%>
-  </p>
 <%= chart %>
 <%- if flows? -%>
 <%- descriptions.each do |id, heading, rows, rest| -%>

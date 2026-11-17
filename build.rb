@@ -257,8 +257,9 @@ class Result
 
     # A wide chart, and a narrow one with shorter labels for phones; the page's CSS shows one.
     label = "#{title}: party votes on the left, electorate candidate votes on the right"
-    Sankey.render(left: left, right: right, flows: flows, label: label, width: 600, prefix: "w") +
-      Sankey.render(left: left, right: right, flows: flows, label: label, width: 360, prefix: "n", short: true)
+    hint = flows? ? "Select a bar for details" : nil
+    Sankey.render(left: left, right: right, flows: flows, label: label, width: 600, prefix: "w", hint: hint) +
+      Sankey.render(left: left, right: right, flows: flows, label: label, width: 360, prefix: "n", short: true, hint: hint)
   end
 
   # Table columns in row order, so each party's own candidate falls on a diagonal: candidates
