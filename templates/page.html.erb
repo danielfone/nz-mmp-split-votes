@@ -37,6 +37,8 @@
   .splits .share { color: var(--muted); }
   figure { margin: 0; }
   .sankey { display: block; width: 100%; height: auto; background: var(--bg); overflow: visible; }
+  .sankey-n { display: none; }
+  @media (max-width: 560px) { .sankey-w { display: none; } .sankey-n { display: block; } }
   .sankey .f { opacity: .6; transition: opacity .15s; }
   .sankey .f.same { opacity: .16; }
   .sankey text { font-size: 13px; fill: var(--ink); paint-order: stroke; stroke: var(--bg); stroke-width: 4px; stroke-linejoin: round; }
@@ -53,9 +55,9 @@
   .d-default { color: var(--muted); }
   .chart:has(.node:is(:hover, :focus)) .d-default { display: none; }
 <%- nodes.select(&:aria).each do |n| -%>
-  .chart:has(#<%= n.id %>:is(:hover, :focus)) .f:not(.<%= n.id %>) { opacity: .05; }
-  .chart:has(#<%= n.id %>:is(:hover, :focus)) .f.<%= n.id %> { opacity: .8; }
-  .chart:has(#<%= n.id %>:is(:hover, :focus)) #d-<%= n.id %> { display: block; }
+  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f:not(.<%= n.id %>) { opacity: .05; }
+  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) .f.<%= n.id %> { opacity: .8; }
+  .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) #d-<%= n.id %> { display: block; }
 <%- end -%>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
   .table-wrap:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }

@@ -82,6 +82,15 @@ Candidate = Struct.new(:name, :party, :votes, :approx) do
     person? ? "#{name.split(', ', 2).first} · #{code(party)}" : official
   end
 
+  # A shorter chart label for narrow screens.
+  def brief
+    if name == party then short(party)
+    elsif name == INDEPENDENTS then "Independents"
+    elsif name == NO_ELECTORATE_VOTE then "Port Waikato"
+    else label
+    end
+  end
+
   # The official form, as published: "GRIGG, Nicola Anna (National Party)".
   def official
     if name == INFORMAL_CANDIDATE then "Informal"
@@ -122,6 +131,11 @@ Group = Struct.new(:label, :party, :members) do
 
   def official
     members.size == 1 && members.first.respond_to?(:official) ? members.first.official : label
+  end
+
+  def brief
+    return "Other" if label.start_with?("Other")
+    members.first.respond_to?(:brief) ? members.first.brief : label
   end
 end
 
@@ -256,10 +270,10 @@ class Result
 
   def chart
     right = right_groups.each_with_index.map do |g, j|
-      Sankey::Node.new("c#{j}", g.label, pct(g.votes, candidate_total), g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
+      Sankey::Node.new("c#{j}", g.label, g.brief, pct(g.votes, candidate_total), g.votes, g.paint, flows? ? candidate_sentence(g) : nil)
     end
     left = left_groups.each_with_index.map do |g, i|
-      Sankey::Node.new("p#{i}", g.label, pct(g.votes, party_total), g.votes, g.paint,
+      Sankey::Node.new("p#{i}", g.label, g.brief, pct(g.votes, party_total), g.votes, g.paint,
                        flows? ? party_sentence(g.label, g.members, right_groups) : nil)
     end
 
@@ -277,8 +291,10 @@ class Result
     end
 
     @nodes = left + right
-    Sankey.render(left: left, right: right, flows: flows,
-                  label: "#{title}: party votes on the left, electorate candidate votes on the right")
+    # A wide chart, and a narrow one with shorter labels for phones; the page's CSS shows one.
+    label = "#{title}: party votes on the left, electorate candidate votes on the right"
+    Sankey.render(left: left, right: right, flows: flows, label: label, width: 600, prefix: "w") +
+      Sankey.render(left: left, right: right, flows: flows, label: label, width: 360, prefix: "n", short: true)
   end
 
   def nodes
