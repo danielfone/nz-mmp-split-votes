@@ -68,10 +68,16 @@
   .chart:has(:is(#w-<%= n.id %>, #n-<%= n.id %>):is(:hover, :focus)) #d-<%= n.id %> { display: block; }
 <%- end -%>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 4px; margin: 0 0 16px; }
+  /* The split-vote table can be wider than the text column. */
+  .table-wrap.wide { width: min(1100px, calc(100vw - 40px)); margin-left: calc(50% - min(550px, 50vw - 20px)); }
+  thead .line { display: block; white-space: nowrap; font-weight: 400; }
+  thead .surname { font-weight: 600; }
+  thead .party { color: var(--muted); }
+  @media (min-width: 700px) { th[scope=row] { min-width: 13em; } }
   .table-wrap:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
   table { border-collapse: collapse; font-size: .875rem; font-variant-numeric: tabular-nums; width: 100%; }
   caption { text-align: left; padding: 8px; font-weight: 600; }
-  th, td { padding: 6px 8px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
+  th, td { padding: 6px 12px; border-top: 1px solid var(--line); text-align: right; vertical-align: top; }
   th[scope=row], thead th:first-child, td.text { text-align: left; }
   thead th { vertical-align: bottom; font-weight: 600; }
   th[scope=row], thead th:first-child { position: sticky; left: 0; z-index: 1; background: var(--bg); }
@@ -163,7 +169,7 @@
 
 <%- if flows? -%>
 <h2>All figures</h2>
-<div class="table-wrap" tabindex="0" role="region" aria-labelledby="table-caption">
+<div class="table-wrap wide" tabindex="0" role="region" aria-labelledby="table-caption">
 <table>
   <caption id="table-caption">Electorate vote by party vote, <%= h title %>. Percentages are of each party's voters.</caption>
   <thead>
@@ -171,7 +177,12 @@
       <th scope="col">Party vote</th>
       <th scope="col">Voters</th>
     <%- candidates.each do |c| -%>
+      <%- if c.person? -%>
+      <%- surname, given = c.name.split(", ", 2) -%>
+      <th scope="col"><span class="line surname"><%= h surname %></span> <span class="line"><%= h given %></span> <span class="line party"><%= h(c.party.to_s.empty? ? "Independent" : c.party) %></span></th>
+      <%- else -%>
       <th scope="col"><%= h c.official %></th>
+      <%- end -%>
     <%- end -%>
     </tr>
   </thead>
