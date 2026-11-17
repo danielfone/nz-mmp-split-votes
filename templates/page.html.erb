@@ -44,7 +44,8 @@
   h2 { font-size: 1.2rem; margin: 32px 0 8px; }
   h3 { font-size: 1rem; margin: 12px 0 4px; }
   .status { color: var(--muted); margin: 0 0 8px; }
-  .lede { font-size: 1.1rem; margin: 0 0 8px; }
+  #summary { margin: 1rem 0; padding: 0.5rem; border: 1px solid var(--line); border-radius: 4px; min-height: 80px; }
+  .lede { color: var(--muted); margin: 0 0 8px; font-style: italic; }
   /* Same-party / split / other bar, in the table's colours so it doubles as the table's key. */
   .shares { margin: 0 0 8px; }
   .shares .bar { display: flex; gap: 2px; height: 12px; border-radius: 3px; overflow: hidden; }
@@ -149,19 +150,24 @@
 <%- if flows? -%>
 <%- same, split, other = vote_shares; whole = [same.round, split.round]; whole << 100 - whole.sum -%>
 <div class="shares" id="summary">
+  <p>Party/Electorate Vote:</p>
   <div class="bar" aria-hidden="true"><span class="same" style="width:<%= same.round(1) %>%"></span><span class="split" style="width:<%= split.round(1) %>%"></span><span class="other" style="width:<%= other.round(1) %>%"></span></div>
   <p aria-hidden="true"><span><span class="key same"></span>Same party</span> <span><span class="key split"></span>Split</span> <span><span class="key other"></span>Informal/none</span></p>
   <p class="vh"><%= whole[0] %>% voted for their party's candidate, <%= whole[1] %>% split their vote, <%= whole[2] %>% informal or no electorate vote.</p>
 </div>
 <%- elsif candidates.any? -%>
-<p class="lede" id="summary">Party and candidate votes<%= national? ? ' nationwide' : " in #{h name}" %>. Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
+<p class="lede" id="summary">Vote splits will be shown once the Electoral Commission publishes split-vote statistics.</p>
 <%- end -%>
 <%- status_line = flows? ? "#{status.capitalize} results · split votes published" : candidates.any? ? "#{status.capitalize} count · split votes not yet published" : "#{status.capitalize} results · party votes only" -%>
 
 <figure class="chart">
-<%- if flows? -%>
-  <p class="hint">Select a party or candidate for details.</p>
-<%- end -%>
+  <p class="hint">
+  <%- if flows? -%>
+    Select a party or candidate for details.
+  <%- else -%>
+    No details available yet.
+  <%- end -%>
+  </p>
 <%= chart %>
 <%- if flows? -%>
 <%- descriptions.each do |id, heading, rows, rest| -%>
