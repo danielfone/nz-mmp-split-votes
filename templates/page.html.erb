@@ -27,7 +27,7 @@
   .switch { font: inherit; color: inherit; background: none; border: 0; border-radius: 6px; padding: 0 4px; margin: 0 -4px; cursor: pointer; text-decoration: underline dotted var(--muted); text-decoration-thickness: 2px; text-underline-offset: 6px; }
   .switch:hover { background: var(--panel); }
   .switch:focus-visible { outline: 2px solid var(--link); outline-offset: 2px; }
-  .chev { font-size: .55em; color: var(--muted); margin-left: .25em; vertical-align: .25em; }
+  .chev { width: .55em; height: .55em; margin-left: .2em; vertical-align: .05em; color: var(--muted); }
   .menu { margin: auto; text-align: left; width: min(44rem, calc(100vw - 32px)); max-height: 80vh; overflow: auto; padding: 16px; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; }
   .menu::backdrop { background: rgb(0 0 0 / .35); }
   .menu h2 { margin: 0 0 8px; }
@@ -140,7 +140,7 @@
 <%- else -%>
 <a class="nationwide" href="<%= page_path(year, 'national') %>">Nationwide</a>
 <%- end -%>
-<h1><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><span class="chev" aria-hidden="true">▾</span></button><span class="vh"> <%= year %></span></h1>
+<h1><button class="switch" popovertarget="place-menu" aria-describedby="place-hint"><%= h name %><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 4l4.5 4.5 4.5-4.5" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"/></svg></button><span class="vh"> <%= year %></span></h1>
 </div>
 <span id="place-hint" hidden>Change electorate</span>
 <%- if flows? -%>
