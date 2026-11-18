@@ -8,7 +8,7 @@ generated at build time, and highlighting uses CSS.
 
     for y in 2017 2020 2023; do ruby import_split_votes.rb $y; done   # data/raw/<y>/*.csv -> data/<y>/*.csv
     ruby import_2026.rb    # data/raw/2026-preliminary/*.html -> data/2026/*.csv
-    ruby build.rb          # data/ -> site/
+    ruby build.rb          # data/ -> site/ (set SITE_URL for absolute canonical and link-preview tags)
     python3 -m http.server 8123 --directory site
 
 Plain Ruby standard library, no gems.

@@ -9,6 +9,7 @@ require_relative "lib/common"
 require_relative "lib/sankey"
 
 OUT = "site"
+SITE_URL = ENV["SITE_URL"].to_s.chomp("/") # e.g. https://example.org/path; needed for link previews
 MAIN_SHARE = 0.02    # groups below this share are drawn as one "Other" node (the tables keep them all)
 SPLIT_SHARE = 20     # a split cell is bold in the table if at least this % of the party's voters made it
 
@@ -390,6 +391,11 @@ class Result
 
   def link(year, slug)
     root + page_path(year, slug)
+  end
+
+  # Absolute URLs, for link previews and the canonical link. Nil without SITE_URL.
+  def url(path)
+    "#{SITE_URL}/#{path}" unless SITE_URL.empty?
   end
 
   def home_link
