@@ -374,6 +374,20 @@ class Result
     shares << 100 - shares.sum
   end
 
+  # One sentence for search results and link previews.
+  def description
+    election = "the #{year} New Zealand general election"
+    if flows?
+      same, split = vote_shares.map(&:round)
+      "How voters #{national? ? 'nationwide' : "in #{name}"} split their party and electorate votes at #{election}: " \
+        "#{same}% gave both votes to the same party and #{split}% split them."
+    elsif candidates.any?
+      "#{status.capitalize} party and electorate vote totals#{" for #{name}" unless national?} from #{election}. Split votes are not yet published."
+    else
+      "Party vote totals for #{name} from #{election}. There was no electorate vote."
+    end
+  end
+
   def link(year, slug)
     root + page_path(year, slug)
   end
