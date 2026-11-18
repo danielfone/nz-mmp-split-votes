@@ -13,6 +13,11 @@ generated at build time, and highlighting uses CSS.
 
 Plain Ruby standard library, no gems.
 
+`static/` is copied into the site as is. Its PNGs (the iOS icon and the
+link-preview card) are made by `ruby make_images.rb`, which needs
+`rsvg-convert` and Google Chrome; rerun it after changing the favicon or party
+colours, and commit the results.
+
 ## Data
 
 - `data/raw/` holds the Electoral Commission's files unchanged.

@@ -439,5 +439,6 @@ end
 home = RESULTS.values.reverse.flatten.find { |r| r.national? && r.flows? }
 home.root = ""
 File.write("#{OUT}/index.html", template.result(home.get_binding))
+FileUtils.cp_r("static/.", OUT) # favicon and share images
 
 puts "Built #{count} pages into #{OUT}/ (homepage: #{home.title})"
