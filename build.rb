@@ -320,7 +320,7 @@ class Result
 
   # Shares that round to at least 1%, largest first, and whether any smaller ones were left out.
   def listed(rows)
-    rows = rows.sort_by { |share, _| -share }
+    rows = rows.each_with_index.sort_by { |(share, _), i| [-share, i] }.map(&:first) # stable, so ties keep their order on every Ruby
     shown = rows.select { |share, _| share.round >= 1 }
     [shown.map { |share, text| [share.round, text] }, rows.size > shown.size && rows.any? { |share, _| share > 0 && share.round < 1 }]
   end
