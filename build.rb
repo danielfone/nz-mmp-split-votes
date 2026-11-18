@@ -54,8 +54,10 @@ def code(party)
   (words.size > 1 ? words.map { |w| w[0] }.join : words.first.to_s)[0, 3].upcase
 end
 
+# Paths are relative to the site root, and links carry each page's `root` prefix,
+# so the site works wherever it's hosted (e.g. under a GitHub Pages project path).
 def page_path(year, slug)
-  slug == "national" ? "/#{year}/" : "/#{year}/#{slug}/"
+  slug == "national" ? "#{year}/" : "#{year}/#{slug}/"
 end
 
 Party = Struct.new(:name, :votes, :cells) do
@@ -127,6 +129,7 @@ end
 
 class Result
   attr_reader :year, :status, :slug, :name, :type, :source, :note, :parties, :candidates
+  attr_accessor :root # from this page to the site root, e.g. "../../"
 
   def initialize(year:, status:, slug:, name:, type:, source:, note:, parties:, candidates:)
     @year, @status, @slug, @name, @type, @source, @note = year, status, slug, name, type, source, note
@@ -371,6 +374,14 @@ class Result
     shares << 100 - shares.sum
   end
 
+  def link(year, slug)
+    root + page_path(year, slug)
+  end
+
+  def home_link
+    root.empty? ? "./" : root
+  end
+
   def get_binding
     binding
   end
@@ -400,7 +411,7 @@ def neighbours(result)
   [i - 1, i + 1].map do |j|
     next nil unless j.between?(0, ELECTIONS.size - 1)
     y = ELECTIONS[j]["year"]
-    [y, RESULTS[y].any? { |r| r.slug == result.slug } ? page_path(y, result.slug) : nil]
+    [y, RESULTS[y].any? { |r| r.slug == result.slug } ? result.link(y, result.slug) : nil]
   end
 end
 
@@ -416,15 +427,17 @@ FileUtils.rm_rf(OUT)
 count = 0
 RESULTS.each do |year, results|
   results.each do |result|
-    path = "#{OUT}#{page_path(year, result.slug)}index.html"
-    FileUtils.mkdir_p(File.dirname(path))
-    File.write(path, template.result(result.get_binding))
+    path = page_path(year, result.slug)
+    result.root = "../" * path.count("/")
+    FileUtils.mkdir_p("#{OUT}/#{path}")
+    File.write("#{OUT}/#{path}index.html", template.result(result.get_binding))
     count += 1
   end
 end
 
 # The homepage is the nationwide page for the latest election with split votes.
 home = RESULTS.values.reverse.flatten.find { |r| r.national? && r.flows? }
-FileUtils.cp("#{OUT}#{page_path(home.year, 'national')}index.html", "#{OUT}/index.html")
+home.root = ""
+File.write("#{OUT}/index.html", template.result(home.get_binding))
 
 puts "Built #{count} pages into #{OUT}/ (homepage: #{home.title})"

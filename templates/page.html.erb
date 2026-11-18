@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><%= h title %> · New Zealand MMP Split-Vote Explorer</title>
-<link rel="canonical" href="<%= page_path(year, slug) %>">
+<link rel="canonical" href="<%= link(year, slug) %>">
 <style>
   /* --panel is set apart from --bg (more so in dark mode, where small steps are harder to see) while keeping --muted text on it at 4.5:1 or better. */
   :root {
@@ -113,15 +113,15 @@
 <body>
 <%- lists = electorate_lists(year) -%>
 <header>
-  <a class="site" href="/"><span class="kicker">New Zealand MMP</span> <span class="name">Split-Vote Explorer</span></a>
+  <a class="site" href="<%= home_link %>"><span class="kicker">New Zealand MMP</span> <span class="name">Split-Vote Explorer</span></a>
   <div id="place-menu" class="menu" popover>
     <h2><%= year %> Electorates</h2>
-    <p><a href="<%= page_path(year, 'national') %>"<%= ' aria-current="page"' if national? %>>Nationwide</a></p>
+    <p><a href="<%= link(year, 'national') %>"<%= ' aria-current="page"' if national? %>>Nationwide</a></p>
     <%- [["general", "General Electorates"], ["maori", "Māori Electorates"]].each do |type, heading| -%>
     <h3><%= heading %></h3>
     <ul class="electorates">
     <%- lists[type].to_a.each do |r| -%>
-      <li><a href="<%= page_path(year, r.slug) %>"<%= ' aria-current="page"' if r.slug == slug %>><%= h r.name %></a></li>
+      <li><a href="<%= link(year, r.slug) %>"<%= ' aria-current="page"' if r.slug == slug %>><%= h r.name %></a></li>
     <%- end -%>
     </ul>
     <%- end -%>
@@ -265,7 +265,7 @@
 <h3><%= heading %></h3>
 <ul class="electorates">
 <%- lists[type].to_a.each do |r| -%>
-  <li><a href="<%= page_path(year, r.slug) %>"><%= h r.name %></a></li>
+  <li><a href="<%= link(year, r.slug) %>"><%= h r.name %></a></li>
 <%- end -%>
 </ul>
 <%- end -%>
